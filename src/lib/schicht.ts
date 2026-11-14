@@ -1,12 +1,13 @@
 import { ladeBoard } from "./board";
 import { ladeUebergaben } from "./entwuerfe";
+import { ladeEigeneAufgaben, ladeNotizen } from "./notizen";
 import { SCHICHT_LABEL, type Schicht, type Sitzung } from "./session";
 
 const NAECHSTE: Record<Schicht, Schicht> = { frueh: "spaet", spaet: "nacht", nacht: "frueh" };
 
 /** Alles, was Startseite und Übergabe-Seite über den Stand der Schicht wissen müssen. */
 export async function ladeSchicht(s: Sitzung) {
-  const [board, eigene] = await Promise.all([ladeBoard(s), ladeUebergaben(s)]);
+  const [board, eigene, notizen, eigeneAufgaben] = await Promise.all([ladeBoard(s), ladeUebergaben(s), ladeNotizen(s), ladeEigeneAufgaben(s)]);
 
   // 0 Übernehmen → 1 Versorgen → 2 Übergabe → 3 Feierabend
   const uebernahmeOffen = board.eintraege.some((e) => e.uebergabe?.status === "bestaetigt");
@@ -19,6 +20,8 @@ export async function ladeSchicht(s: Sitzung) {
     aktiv,
     board,
     eigene,
+    notizen,
+    eigeneAufgaben,
     info: {
       name: s.mitarbeiter.name,
       vorname: s.mitarbeiter.name.split(" ")[0],

@@ -2,10 +2,12 @@ import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
 import { vorherigeSchicht } from "./board";
+import { ladeEigeneAufgaben, ladeNotizen } from "./notizen";
 import { db } from "./supabase";
 import { SCHICHT_LABEL, type Sitzung } from "./session";
 import type { Patient } from "./types";
 import { VITAL_TYPEN, VITALS, vitalsTabelleText } from "./vitals-config";
+import { uhrzeit } from "./zeit";
 
 // Ablauf (schnell durch Parallelisierung):
 // 1. Kontext laden (Patienten im Bereich, Verlauf, letzte Übergaben) – ohne Modell
@@ -81,17 +83,24 @@ ${vitalsTabelleText()}
   info = Angehörige, geplante Entlassung, Organisatorisches
 - warnings: Hinweise für die übernehmende Schicht. rot = zeitnah ärztlich abklären, gelb = beobachten. Jeder kritische Punkt aus highlights bekommt eine rote Warnung. Formuliere als Hinweis mit Begründung und Frage, z. B. "Blutdruck seit 4 Schichten steigend (138 → 172 mmHg), dazu Kopfschmerz – Arzt informieren?".
 - tasks: konkrete Aufgaben für die nächste Schicht, mit Zeitpunkt falls genannt.
-- Offene Aufgaben aus der Übernahme: Erwähnt der Abschnitt, dass eine davon erledigt ist, ist sie erledigt. Sonst übernimm sie in tasks und markiere sie mit einem beachten-Highlight, z. B. "Blutdruck-Kontrolle 07:00 nicht abgehakt – erledigt?".`;
+- Offene Aufgaben (aus der Übernahme oder selbst angelegt): Erwähnt der Abschnitt oder eine Notiz, dass eine davon erledigt ist, ist sie erledigt. Sonst übernimm sie in tasks für die nächste Schicht und markiere sie mit einem beachten-Highlight, z. B. "Blutdruck-Kontrolle 07:00 nicht abgehakt – erledigt?".
+- Notizen der Pflegekraft aus dieser Schicht (mit Uhrzeit) gehören zur Übergabe dazu, auch wenn sie im Abschnitt nicht wiederholt werden. Baue sie in SBAR, highlights, warnings und tasks ein. Messwerte aus Notizen übernimmst du in vitals, wenn der Abschnitt keinen neueren Wert desselben Typs nennt (pro Typ nur der neueste Wert). Ältere Werte nennst du im assessment mit Uhrzeit.`;
 }
 
 // ---------- Kontext ----------
 
-type Kontext = { verlauf: unknown[]; letzte: unknown[]; offeneAufgaben: { text: string; faellig: string | null }[] };
+type Kontext = {
+  verlauf: unknown[];
+  letzte: unknown[];
+  offeneAufgaben: { text: string; faellig: string | null; quelle: "übernahme" | "eigene" }[];
+  notizen: { uhrzeit: string; text: string }[];
+};
 
-async function ladeKontext(s: Sitzung, patienten: Patient[]): Promise<Map<string, Kontext>> {
+export async function ladeKontext(s: Sitzung, patienten: Patient[]): Promise<Map<string, Kontext>> {
   const supa = db();
   const ids = patienten.map((p) => p.id);
   const vorher = vorherigeSchicht(s.datum, s.schicht);
+  const [notizen, eigeneAufgaben] = await Promise.all([ladeNotizen(s), ladeEigeneAufgaben(s)]);
   const { data: hs } = await supa
     .from("handovers")
     .select(
@@ -106,7 +115,11 @@ async function ladeKontext(s: Sitzung, patienten: Patient[]): Promise<Map<string
     // Aufgaben aus der Übernahme, die in dieser Schicht nicht abgehakt wurden
     const uebernommen = (hs ?? []).find((h) => h.patient_id === p.id && h.datum === vorher.datum && h.schicht === vorher.schicht);
     map.set(p.id, {
-      offeneAufgaben: (uebernommen?.tasks ?? []).filter((t) => !t.erledigt).map(({ text, faellig }) => ({ text, faellig })),
+      offeneAufgaben: [
+        ...(uebernommen?.tasks ?? []).filter((t) => !t.erledigt).map(({ text, faellig }) => ({ text, faellig, quelle: "übernahme" as const })),
+        ...eigeneAufgaben.filter((t) => t.patient_id === p.id && !t.erledigt).map(({ text, faellig }) => ({ text, faellig, quelle: "eigene" as const })),
+      ],
+      notizen: notizen.filter((n) => n.patient_id === p.id).map((n) => ({ uhrzeit: uhrzeit(n.created_at), text: n.text })),
       verlauf: eigene
         .flatMap((h) => (h.vitals ?? []).map((v) => ({ schicht: `${h.datum} ${h.schicht}`, ...v })))
         .sort((a, b) => String(a.zeitpunkt).localeCompare(String(b.zeitpunkt))),
@@ -220,7 +233,7 @@ export async function runHandoverAgent(opts: {
   let fehler = 0;
   await Promise.all(
     zuordnung.map(async ({ patient: p, abschnitt }) => {
-      const k = kontext.get(p.id) ?? { verlauf: [], letzte: [], offeneAufgaben: [] };
+      const k = kontext.get(p.id) ?? { verlauf: [], letzte: [], offeneAufgaben: [], notizen: [] };
       emit({ type: "step", text: `Helfer-Otter wertet ${p.name} aus (${k.letzte.length ? `${k.letzte.length} Schichten Verlauf` : "Neuaufnahme"})` });
       try {
         const res = await client.beta.messages.parse({
@@ -239,8 +252,9 @@ export async function runHandoverAgent(opts: {
                   ? `Messwert-Verlauf (älteste zuerst):\n${JSON.stringify(k.verlauf)}\n\nLetzte Übergaben (neueste zuerst):\n${JSON.stringify(k.letzte)}`
                   : "Kein Verlauf vorhanden (Neuaufnahme).",
                 k.offeneAufgaben.length
-                  ? `Aufgaben aus der Übernahme, die in dieser Schicht NICHT abgehakt wurden:\n${JSON.stringify(k.offeneAufgaben)}`
+                  ? `Offene Aufgaben dieser Schicht (NICHT abgehakt):\n${JSON.stringify(k.offeneAufgaben)}`
                   : "",
+                k.notizen.length ? `Notizen der Pflegekraft aus dieser Schicht:\n${JSON.stringify(k.notizen)}` : "",
                 `Transkript-Abschnitt dieser Schicht:\n${abschnitt}`,
               ].filter(Boolean).join("\n\n"),
             },
