@@ -1,32 +1,30 @@
 # Demo-Skript: Übergabe Frühdienst → Spätdienst, Flur A
 
-Passt zu den Testdaten in Supabase (Projekt "Hackathon").
+Passt zu den Testdaten in Supabase (Projekt "Hackathon"). Flur A hat **2 Patienten**: Frau Müller (Zi. 4) und Frau Becker (Zi. 5).
 
 **Vor jeder Probe und vor der Präsentation:** `npm run demo:reset`
 Löscht alle Übergaben und spielt den Verlauf (gestern Früh/Spät/Nacht) und den Dienstplan passend zum heutigen Datum neu ein.
-Anmelden als **Anna Richter (P-1023)**, Frühdienst Flur A. Übernimmt: **Ben Krause (P-1047)**, Spätdienst Flur A.
+Nur die offene Nachtschicht (ohne Verlauf davor): `npm run demo:nacht`
 
-## Zum Vorlesen (ca. 90 Sekunden)
+## Ablauf
 
-Zimmer drei, Herr Schneider, Pneumonie. Deutlich besser heute. Temperatur siebenunddreißig komma zwei, Sättigung sechsundneunzig Prozent mit einem Liter Sauerstoff. Blutdruck hundertzwanzig zu fünfundsiebzig, Puls achtzig. Schmerzen eins. War heute zweimal mit Physio auf dem Flur. Sauerstoff kann eventuell heute Nachmittag ganz weg.
+1. Anmelden als **Anna Richter (P-1023)**, Frühdienst Flur A → Popup "Übergabe vom Nachtdienst" → **Alles gesichtet, übernehmen**
+2. "Meine Schicht": z. B. **Trinkprotokoll** bei Frau Becker abhaken, die **Blutdruck-Kontrolle 07:00** bei Frau Müller bewusst offen lassen
+3. **Schicht beenden & Übergabe einsprechen** → Text unten vorlesen → **An Otti geben** → Entwürfe prüfen und bestätigen
+4. Abmelden, anmelden als **Ben Krause (P-1047)**, Spätdienst Flur A → Popup mit Annas Übergabe → übernehmen
+
+## Zum Vorlesen (ca. 40 Sekunden)
 
 Zimmer vier, Frau Müller. Blutdruck heute Morgen hundertzweiundsiebzig zu achtundneunzig, Puls achtundachtzig. Sie klagt über Kopfschmerzen, Schmerzen vier von zehn. Hat ihre Tabletten genommen. Ist etwas schwindelig beim Aufstehen.
 
 Zimmer fünf, Frau Becker. Hat heute Vormittag etwa sechshundert Milliliter getrunken, Infusion läuft weiter. Blutdruck hundertzwanzig zu siebzig, Puls achtundsiebzig. Nachts war sie wieder unruhig, Klingel liegt in Reichweite. Tochter kommt heute Nachmittag zu Besuch.
 
-Zimmer sechs, Herr Wagner. Blutzucker vor dem Mittagessen hundertzweiundvierzig. Blutdruck hundertvierundzwanzig zu achtundsiebzig, Puls hundertsechs, unregelmäßig wie bekannt. Keine Schmerzen. Diabetesberatung ist für morgen angemeldet.
-
-Zimmer sieben, Herr Krüger, Neuaufnahme heute früh mit Brustschmerzen. Blutdruck hundertachtunddreißig zu sechsundachtzig, Puls zweiundneunzig, Schmerzen drei. Troponin-Kontrolle um sechzehn Uhr steht noch aus. EKG ist geschrieben.
-
 ## Was der Agent finden soll
 
 | Patient | Erwartung |
 |---|---|
-| Müller (Zi. 4) | 🔴 **Blutdruck-Trend:** 138/84 → 149/88 → 158/92 → **172/98**, dazu Kopfschmerzen und Schwindel → Arzt informieren |
-| Schneider (Zi. 3) | Besserung: Fieber 38,9 → 37,2 °C, Sättigung steigt. Kein Alarm |
+| Müller (Zi. 4) | 🔴 **Blutdruck-Trend:** 138/84 → 149/88 → 158/92 → **172/98**, dazu Kopfschmerzen und Schwindel → Arzt informieren. Erinnert an die **nicht abgehakte Blutdruck-Kontrolle 07:00** |
 | Becker (Zi. 5) | 🟡 Sturzrisiko, Trinkmenge. 🔵 Tochter kommt. **Schmerzwert fehlt** → gelbes Pflichtfeld |
-| Wagner (Zi. 6) | Puls 106, aber **bekanntes Vorhofflimmern** → Agent soll das begründet einordnen, nicht rot |
-| Krüger (Zi. 7) | **Neuaufnahme, kein Verlauf.** 🟡 Troponin-Kontrolle 16 Uhr als Aufgabe |
 
 ## Optional: "Nicht zugeordnet" zeigen
 

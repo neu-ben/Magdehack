@@ -35,10 +35,10 @@ const MITARBEITER = [
 
 const PATIENTEN = [
   ["Margarete Müller", 78, "w", "4", "Flur A", "Arterielle Hypertonie, Herzinsuffizienz NYHA II", -3],
-  ["Karl Schneider", 66, "m", "3", "Flur A", "Ambulant erworbene Pneumonie", -4],
+  ["Karl Schneider", 66, "m", "10", "Flur B", "Ambulant erworbene Pneumonie", -4],
   ["Ingrid Becker", 84, "w", "5", "Flur A", "Exsikkose bei Harnwegsinfekt, erhöhtes Sturzrisiko", -2],
-  ["Thomas Wagner", 59, "m", "6", "Flur A", "Entgleister Diabetes mellitus Typ 2, bekanntes Vorhofflimmern", -3],
-  ["Peter Krüger", 52, "m", "7", "Flur A", "Thoraxschmerz zur Abklärung", 0],
+  ["Thomas Wagner", 59, "m", "11", "Flur B", "Entgleister Diabetes mellitus Typ 2, bekanntes Vorhofflimmern", -3],
+  ["Peter Krüger", 52, "m", "12", "Flur B", "Thoraxschmerz zur Abklärung", 0],
   ["Helga Hoffmann", 71, "w", "8", "Flur B", "COPD-Exazerbation", -3],
   ["Jürgen Schulz", 69, "m", "9", "Flur B", "Obere GI-Blutung, Überwachung nach Gastroskopie", -2],
 ];
