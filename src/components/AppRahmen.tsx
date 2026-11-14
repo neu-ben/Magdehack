@@ -2,18 +2,61 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { abmelden } from "@/app/actions";
 import { IconBoard, IconChat, IconMikro, IconTuer } from "./Icons";
 
-/** Leiste oben: angemeldete Pflegekraft */
+/** Leiste oben: angemeldete Pflegekraft, Klick aufs Kürzel öffnet das Konto-Menü */
 export function StatusLeiste({ name }: { name: string }) {
   const initialen = name.split(" ").map((t) => t[0]).join("");
+  const [offen, setOffen] = useState(false);
+  const bereich = useRef<HTMLDivElement>(null);
+
+  // Menü schließen bei Klick daneben oder Escape
+  useEffect(() => {
+    if (!offen) return;
+    const klick = (e: MouseEvent) => {
+      if (!bereich.current?.contains(e.target as Node)) setOffen(false);
+    };
+    const taste = (e: KeyboardEvent) => e.key === "Escape" && setOffen(false);
+    document.addEventListener("mousedown", klick);
+    document.addEventListener("keydown", taste);
+    return () => {
+      document.removeEventListener("mousedown", klick);
+      document.removeEventListener("keydown", taste);
+    };
+  }, [offen]);
+
   return (
-    <div className="sticky top-0 z-20 flex items-center gap-3 border-b-2 border-linie bg-white px-4 py-2.5">
-      <span className="grid h-9 w-9 place-items-center rounded-xl border-2 border-b-4 border-linie bg-tuerkis-hell text-sm font-black text-tuerkis" aria-hidden>
-        {initialen}
-      </span>
-      <span className="text-sm font-extrabold text-tinte">{name}</span>
+    <div className="sticky top-0 z-20 flex items-center border-b-2 border-linie bg-white px-4 py-2.5">
+      <div ref={bereich} className="relative">
+        <button
+          type="button"
+          onClick={() => setOffen((o) => !o)}
+          aria-haspopup="menu"
+          aria-expanded={offen}
+          className="flex items-center gap-3 rounded-xl pr-2 hover:bg-flaeche"
+        >
+          <span className="grid h-9 w-9 place-items-center rounded-xl border-2 border-b-4 border-linie bg-tuerkis-hell text-sm font-black text-tuerkis">
+            {initialen}
+          </span>
+          <span className="text-sm font-extrabold text-tinte">{name}</span>
+        </button>
+        {offen && (
+          <div role="menu" className="karte anim-einblenden absolute left-0 top-full mt-2 w-56 p-2 shadow-lg">
+            <p className="px-3 pb-2 pt-1 text-xs font-bold text-grau">Angemeldet als {name}</p>
+            <form action={abmelden}>
+              <button
+                role="menuitem"
+                className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-extrabold uppercase tracking-wide text-koralle hover:bg-koralle-hell"
+              >
+                <IconTuer />
+                Abmelden
+              </button>
+            </form>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
