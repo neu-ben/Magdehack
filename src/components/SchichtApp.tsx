@@ -32,7 +32,9 @@ export function SchichtApp({ info, eintraege, aktiv }: { info: Info; eintraege: 
   // Alle Aufgaben abgehakt -> "Versorgen" ist erledigt, "Übergabe" wird aktiv und anklickbar
   const versorgt = aktiv === 1 && aufgaben.length > 0 && offen.length === 0;
   const pfadAktiv: Stufe = versorgt ? 2 : aktiv;
-  const pfadLinks = pfadAktiv === 2 ? { 2: "/schicht/uebergabe" } : undefined;
+  const pfadLinks: Partial<Record<number, string>> = {};
+  if (aktiv >= 1 && aktiv < 3) pfadLinks[1] = "#aufgaben"; // Versorgen -> Aufgabenliste
+  if (pfadAktiv === 2) pfadLinks[2] = "/schicht/uebergabe";
 
   async function abhaken(id: string, erledigt: boolean) {
     setAufgaben((as) => as.map((a) => (a.id === id ? { ...a, erledigt } : a)));
@@ -93,7 +95,7 @@ export function SchichtApp({ info, eintraege, aktiv }: { info: Info; eintraege: 
         )}
 
         {/* Aufgaben aus der Übernahme */}
-        <section>
+        <section id="aufgaben" className="scroll-mt-16">
           <Titel>
             Aufgaben aus der Übernahme · {aufgaben.length - offen.length}/{aufgaben.length}
           </Titel>

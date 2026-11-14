@@ -2,13 +2,13 @@ import Link from "next/link";
 import { IconBoard, IconHaken, IconMikro, IconTuer } from "./Icons";
 import { Otti, type OttiStimmung } from "./Otti";
 
-// Schicht-Pfad: Übernommen → Versorgen → Übergabe → Feierabend.
+// Schicht-Pfad: Zusammenfassung (Übernahme) → Versorgen → Übergabe → Feierabend.
 // "gross": geschwungener Weg mit runden 3D-Stationen (Startseite), "klein": kompakte Leiste.
 
 export type Stufe = 0 | 1 | 2 | 3 | 4; // Index der aktiven Station, 4 = alles erledigt
 
 const STATIONEN = [
-  { label: "Übernommen", icon: <IconHaken className="h-8 w-8" /> },
+  { label: "Zusammenfassung", icon: <IconHaken className="h-8 w-8" /> },
   { label: "Versorgen", icon: <IconBoard className="h-8 w-8" /> },
   { label: "Übergabe", icon: <IconMikro className="h-8 w-8" /> },
   { label: "Feierabend", icon: <IconTuer className="h-8 w-8" /> },
@@ -41,7 +41,7 @@ export function SchichtPfad({
               <span className={`grid h-9 w-9 place-items-center rounded-full border-b-4 ${stil(i, aktiv)} [&_svg]:h-5 [&_svg]:w-5`}>
                 {i < aktiv ? <IconHaken className="h-5 w-5" /> : s.icon}
               </span>
-              <span className={`text-[10px] font-extrabold uppercase tracking-wide ${i === aktiv ? "text-koralle-dunkel" : "text-grau"}`}>{s.label}</span>
+              <span className={`whitespace-nowrap text-[10px] font-extrabold uppercase tracking-tight ${i === aktiv ? "text-koralle-dunkel" : "text-grau"}`}>{s.label}</span>
             </span>
             {i < STATIONEN.length - 1 && <span className={`mx-1 mb-4 h-1.5 flex-1 rounded-full ${i < aktiv ? "bg-tuerkis" : "bg-linie"}`} />}
           </li>
@@ -103,9 +103,19 @@ export function SchichtPfad({
           const { x, y } = PUNKTE[i];
           const knoten = `relative grid h-[72px] w-[72px] place-items-center rounded-full border-b-[7px] ${stil(i, aktiv)}`;
           return (
-            <li key={s.label} className="absolute flex w-28 flex-col items-center" style={{ left: x - 56, top: y - R }}>
+            <li key={s.label} className="absolute flex w-40 flex-col items-center" style={{ left: x - 80, top: y - R }}>
               {i === aktiv && aktiv < 4 && <span className="absolute -top-2 h-[88px] w-[88px] animate-pulse rounded-full bg-koralle/15" aria-hidden />}
-              {links?.[i] ? (
+              {links?.[i]?.startsWith("#") ? (
+                // Sprungmarke auf derselben Seite: normaler Anker, der Browser scrollt sanft
+                <a
+                  href={links[i]!}
+                  className={`${knoten} transition-transform hover:brightness-105 active:translate-y-1 active:border-b-2`}
+                  aria-current={i === aktiv ? "step" : undefined}
+                  aria-label={`${s.label}: zur Aufgabenliste`}
+                >
+                  {i < aktiv ? <IconHaken className="h-9 w-9" /> : s.icon}
+                </a>
+              ) : links?.[i] ? (
                 <Link
                   href={links[i]!}
                   className={`${knoten} transition-transform hover:brightness-105 active:translate-y-1 active:border-b-2`}
@@ -120,7 +130,7 @@ export function SchichtPfad({
                 </span>
               )}
               <span
-                className={`relative mt-1 rounded-md bg-white px-1 text-xs font-extrabold uppercase tracking-wider ${
+                className={`relative mt-1 whitespace-nowrap rounded-md bg-white px-1 text-xs font-extrabold uppercase tracking-wider ${
                   i === aktiv ? "text-koralle-dunkel" : i < aktiv ? "text-tuerkis-dunkel" : "text-grau"
                 }`}
               >
