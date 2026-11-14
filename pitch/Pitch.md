@@ -1,7 +1,7 @@
 # Pitch: Otti – Sprach-Übergabe für die Pflege
 
 **Höchstens 3 Minuten insgesamt.** Davon sind etwa 45 s Folien, 2:00 Live-Demo und 10 s Schluss.
-Die Folien liegen in [pitch/praesentation.html](../pitch/praesentation.html). Blättern geht mit den Pfeiltasten oder der Leertaste, **F** schaltet auf Vollbild.
+Die Folien liegen in [pitch/praesentation.html](praesentation.html). Blättern geht mit den Pfeiltasten oder der Leertaste, **F** schaltet auf Vollbild.
 Den Klick-Ablauf der Demo findest du in [Demo.md](Demo.md).
 
 | Teil | Zeit | bis |

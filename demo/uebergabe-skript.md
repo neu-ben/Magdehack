@@ -1,4 +1,4 @@
-> **Veraltet:** Der aktuelle 2-Minuten-Ablauf mit kürzerem Vorlesetext steht in [Demo.md](Demo.md).
+> **Veraltet:** Der aktuelle 2-Minuten-Ablauf mit kürzerem Vorlesetext steht in [Demo.md](../pitch/Demo.md).
 
 # Demo-Skript: Übergabe Frühdienst → Spätdienst, Flur A
 
