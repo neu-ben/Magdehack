@@ -24,6 +24,6 @@ export default function SchichtPage() {
 async function Schicht() {
   const s = await aktuelleSitzung();
   if (!s) redirect("/");
-  const { aktiv, board, info } = await ladeSchicht(s);
-  return <SchichtApp key={aktiv} info={info} eintraege={board.eintraege} aktiv={aktiv} />;
+  const { aktiv, board, info, notizen, eigeneAufgaben } = await ladeSchicht(s);
+  return <SchichtApp key={aktiv} info={info} eintraege={board.eintraege} aktiv={aktiv} notizen={notizen} eigeneAufgaben={eigeneAufgaben} />;
 }

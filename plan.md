@@ -38,6 +38,26 @@ Pflegekräfte auf einer Station der **Inneren Medizin**: die abgebende und die �
 | Übernahme | **Direkt nach dem Login als Popup:** Überblick über die vorherige Schicht im eigenen Bereich, kompakt, kritische Hinweise zuerst, pro Patient aufklappbar. **„Alles gesichtet, übernehmen“** übernimmt den ganzen Bereich, danach geht es in die Sprachübergabe. Das Board bleibt als Nachschlage-Ansicht. |
 | Demo | **Live einsprechen** mit einem vorbereiteten Übergabe-Skript, das zu den Testdaten passt. Dasselbe Skript liegt als Text bereit, falls das Mikrofon versagt. |
 
+## Otti-Chat: Notizen, Fragen, eigene Aufgaben (Grill-Runde 3)
+
+| Thema | Entscheidung |
+|---|---|
+| Form | Ein Chat mit Otti (`/otti`, Tab „Otti“, Notiz-Button in Meine Schicht). Otti erkennt Notiz, Frage, eigene Aufgabe und „Aufgabe erledigt“ selbst, auch gemischt in einem Satz |
+| Eingabe | Sprechen und Tippen; Mikro startet nur auf Tippen; Otti liest nicht vor |
+| Zuordnung | Otti erkennt den Patienten am Nachnamen oder an der Zimmernummer (großzügig, Anrede egal), Chip zum Ändern; ohne Patient = ganzer Flur |
+| Patient aus anderem Bereich | Nichts speichern, Hinweis an die zuständige Pflegekraft |
+| Speichern | Notizen als Rohtext; Auswertung erst bei der Übergabe (Agent bekommt Notizen und offene eigene Aufgaben als Kontext) |
+| Korrigieren | Notizen löschen, nicht bearbeiten; eigene Aufgaben „Rückgängig“ |
+| Sichtbarkeit | Notizen nur für die eigene Person und Schicht; weiter geht nur, was in der bestätigten Übergabe steht |
+| Fragen | Nur aus den Daten des eigenen Flurs, keine Diagnosen, höchstens „Arzt informieren?“; Fragen/Antworten werden nicht gespeichert |
+| Eigene Aufgaben | In der Aufgabenliste in Meine Schicht (Kennzeichen „eigene“), zählen für „Versorgen“; offen gebliebene schlägt der Agent der nächsten Schicht vor |
+| Uhrzeit | Keine Erinnerung zur Uhrzeit, nur Markierung „überfällig“ |
+| Erledigt melden | Otti schlägt „Aufgabe abhaken?“ vor, abgehakt wird nur auf Tippen |
+| Verfügbarkeit | Vor der Übernahme gesperrt; nach bestätigter Übergabe nur Fragen |
+| Übergabe-Seite | Aufklappbare Liste „Deine Notizen“, Notizzahl auf den Kacheln; Entwürfe nur für besprochene Patienten, Otti erinnert an Patienten mit Notizen ohne Übergabe |
+| Modell | `CLAUDE_OTTI_MODEL`, Standard Sonnet 5.5, ein Aufruf pro Nachricht |
+| Demo | `demo:reset` legt die Notiz „Becker 11:30: Mittagessen kaum angerührt, wirkt müde“ für Anna an |
+
 ## Kern-Ablauf (das MUSS in der Demo laufen)
 0. **Anmelden:** Die Pflegekraft meldet sich an. Die App holt aus dem Schichtplan Schicht und Bereich und lädt nur die Patienten dieses Bereichs.
 1. **Aufnehmen:** Die abgebende Pflegekraft startet die Aufnahme und spricht die Übergabe ein. Stufe 1: pro Patient. Stufe 2: alle am Stück.

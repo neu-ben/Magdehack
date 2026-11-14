@@ -24,7 +24,7 @@ export default function UebergabePage() {
 async function Uebergabe() {
   const s = await aktuelleSitzung();
   if (!s) redirect("/");
-  const { aktiv, eigene, info } = await ladeSchicht(s);
+  const { aktiv, eigene, info, notizen } = await ladeSchicht(s);
   if (aktiv === 0) redirect("/schicht"); // erst die Vorschicht übernehmen
-  return <AufnahmeApp sitzung={info} patienten={eigene.patienten} initial={eigene.uebergaben} />;
+  return <AufnahmeApp sitzung={info} patienten={eigene.patienten} initial={eigene.uebergaben} notizen={notizen} />;
 }

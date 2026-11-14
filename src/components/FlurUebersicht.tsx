@@ -46,7 +46,18 @@ const STIL: Record<FlurStatus, { box: string; text: string; label: string }> = {
   bestaetigt: { box: "border-tuerkis-dunkel bg-tuerkis", text: "text-white", label: "bestätigt" },
 };
 
-export function FlurUebersicht({ bereich, patienten, status }: { bereich: string; patienten: Patient[]; status: Map<string, FlurStatus> }) {
+export function FlurUebersicht({
+  bereich,
+  patienten,
+  status,
+  notizen,
+}: {
+  bereich: string;
+  patienten: Patient[];
+  status: Map<string, FlurStatus>;
+  /** Anzahl Notizen dieser Schicht pro Patient */
+  notizen?: Map<string, number>;
+}) {
   const sortiert = [...patienten].sort((a, b) => a.zimmer.localeCompare(b.zimmer, "de", { numeric: true }));
   const besprochen = sortiert.filter((p) => status.get(p.id) !== "offen").length;
 
@@ -62,6 +73,7 @@ export function FlurUebersicht({ bereich, patienten, status }: { bereich: string
         {sortiert.map((p) => {
           const st = status.get(p.id) ?? "offen";
           const s = STIL[st];
+          const n = notizen?.get(p.id) ?? 0;
           return (
             <li key={p.id} className={`flex flex-col items-center rounded-2xl border-2 border-b-4 px-1 py-2 text-center transition-colors ${s.box}`}>
               <span className={`flex items-center gap-1 text-lg font-black leading-none ${st === "bestaetigt" ? "text-white" : "text-tinte"}`}>
@@ -72,6 +84,12 @@ export function FlurUebersicht({ bereich, patienten, status }: { bereich: string
                 {p.name.split(" ").at(-1)}
               </span>
               <span className={`text-[10px] font-extrabold uppercase tracking-wide ${s.text}`}>{s.label}</span>
+              {n > 0 && (
+                <span className={`mt-0.5 rounded-md px-1.5 text-[10px] font-extrabold ${st === "bestaetigt" ? "bg-white/25 text-white" : "bg-himmel-hell text-himmel"}`}>
+                  {n} Notiz{n === 1 ? "" : "en"}
+                  {st === "offen" && " · nicht besprochen"}
+                </span>
+              )}
             </li>
           );
         })}

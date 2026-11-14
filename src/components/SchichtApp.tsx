@@ -1,28 +1,60 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import type { BoardEintrag } from "@/lib/board";
+import type { EigeneAufgabe, Notiz } from "@/lib/notizen";
+import { faelligMinuten, jetztMinuten, uhrzeit } from "@/lib/zeit";
 import { KopfBand, StatusLeiste, TabLeiste } from "./AppRahmen";
 import { ZimmerBadge } from "./EntwurfKarte";
-import { IconHaken, IconMikro, IconWarnung } from "./Icons";
+import { IconChat, IconHaken, IconMikro, IconWarnung } from "./Icons";
+import { PatientChip } from "./Notizen";
 import { Otti } from "./Otti";
 import { SchichtPfad, type Stufe } from "./SchichtPfad";
 import { UebernahmePopup } from "./UebernahmePopup";
 
 type Info = { name: string; vorname: string; schicht: string; vorherSchicht: string; naechsteSchicht: string; bereich: string; datum: string };
-type AufgabeZeile = { id: string; text: string; faellig: string | null; erledigt: boolean; patient: BoardEintrag["patient"] };
+type Patient = BoardEintrag["patient"];
+type AufgabeZeile = { id: string; text: string; faellig: string | null; erledigt: boolean; patient: Patient | null; eigene: boolean };
 
-export function SchichtApp({ info, eintraege, aktiv }: { info: Info; eintraege: BoardEintrag[]; aktiv: Stufe }) {
+// Uhr für "überfällig": jede halbe Minute neu; auf dem Server keine Markierung (kein Hydration-Mismatch)
+const uhrAbo = (cb: () => void) => {
+  const t = setInterval(cb, 30_000);
+  return () => clearInterval(t);
+};
+
+export function SchichtApp({
+  info,
+  eintraege,
+  aktiv,
+  eigeneAufgaben,
+  notizen,
+}: {
+  info: Info;
+  eintraege: BoardEintrag[];
+  aktiv: Stufe;
+  eigeneAufgaben: EigeneAufgabe[];
+  notizen: Notiz[];
+}) {
   const router = useRouter();
   const uebernahmeOffen = aktiv === 0;
-  const [aufgaben, setAufgaben] = useState<AufgabeZeile[]>(() =>
-    eintraege.flatMap((e) =>
+  const patienten = eintraege.map((e) => e.patient);
+  const jetzt = useSyncExternalStore(uhrAbo, jetztMinuten, () => null);
+  // Abgehakt-Stand lokal überschreiben, bis der Server ihn bestätigt hat
+  const [abgehakt, setAbgehakt] = useState<Record<string, boolean>>({});
+  const aufgaben: AufgabeZeile[] = [
+    ...eintraege.flatMap((e) =>
       (e.uebergabe?.tasks ?? [])
         .filter((t) => t.id)
-        .map((t) => ({ id: t.id!, text: t.text, faellig: t.faellig, erledigt: !!t.erledigt, patient: e.patient })),
+        .map((t) => ({ id: t.id!, text: t.text, faellig: t.faellig, erledigt: !!t.erledigt, patient: e.patient, eigene: false })),
     ),
-  );
+    ...eigeneAufgaben.map((t) => ({ ...t, patient: patienten.find((p) => p.id === t.patient_id) ?? null, eigene: true })),
+  ].map((a) => (a.id in abgehakt ? { ...a, erledigt: abgehakt[a.id] } : a));
+  const ueberfaellig = (a: AufgabeZeile) => {
+    const m = faelligMinuten(a.faellig);
+    return !a.erledigt && jetzt != null && m != null && m < jetzt;
+  };
   const [dialog, setDialog] = useState(false);
 
   const kritisch = eintraege.flatMap((e) =>
@@ -37,13 +69,13 @@ export function SchichtApp({ info, eintraege, aktiv }: { info: Info; eintraege: 
   if (pfadAktiv === 2) pfadLinks[2] = "/schicht/uebergabe";
 
   async function abhaken(id: string, erledigt: boolean) {
-    setAufgaben((as) => as.map((a) => (a.id === id ? { ...a, erledigt } : a)));
+    setAbgehakt((m) => ({ ...m, [id]: erledigt }));
     const res = await fetch(`/api/tasks/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ erledigt }),
     });
-    if (!res.ok) setAufgaben((as) => as.map((a) => (a.id === id ? { ...a, erledigt: !erledigt } : a)));
+    if (!res.ok) setAbgehakt((m) => ({ ...m, [id]: !erledigt }));
   }
 
   function zurUebergabe() {
@@ -51,9 +83,9 @@ export function SchichtApp({ info, eintraege, aktiv }: { info: Info; eintraege: 
     else router.push("/schicht/uebergabe");
   }
 
-  // Aufgaben nach Patient gruppieren (Reihenfolge wie Board: Kritisches zuerst)
-  const gruppen = eintraege
-    .map((e) => ({ patient: e.patient, aufgaben: aufgaben.filter((a) => a.patient.id === e.patient.id) }))
+  // Aufgaben nach Patient gruppieren (Reihenfolge wie Board: Kritisches zuerst), Flur-Aufgaben am Ende
+  const gruppen = [...patienten, null]
+    .map((p) => ({ patient: p, aufgaben: aufgaben.filter((a) => (a.patient?.id ?? null) === (p?.id ?? null)) }))
     .filter((g) => g.aufgaben.length);
 
   let sprechblase = `Los geht's, ${info.vorname}! Hak ab, was du erledigt hast. Am Ende sprichst du mir die Übergabe ein.`;
@@ -91,15 +123,15 @@ export function SchichtApp({ info, eintraege, aktiv }: { info: Info; eintraege: 
         {/* Aufgaben aus der Übernahme */}
         <section id="aufgaben" className="scroll-mt-16">
           <Titel>
-            Aufgaben aus der Übernahme · {aufgaben.length - offen.length}/{aufgaben.length}
+            Aufgaben · {aufgaben.length - offen.length}/{aufgaben.length}
           </Titel>
-          {gruppen.length === 0 && <p className="text-sm font-semibold text-grau">Keine Aufgaben übernommen.</p>}
+          {gruppen.length === 0 && <p className="text-sm font-semibold text-grau">Keine Aufgaben. Eigene legst du über Otti an.</p>}
           <div className="flex flex-col gap-3">
             {gruppen.map((g) => (
-              <article key={g.patient.id} className="karte px-3 py-3">
+              <article key={g.patient?.id ?? "flur"} className="karte px-3 py-3">
                 <header className="mb-2 flex items-center gap-2">
-                  <ZimmerBadge zimmer={g.patient.zimmer} />
-                  <p className="font-extrabold">{g.patient.name}</p>
+                  {g.patient ? <ZimmerBadge zimmer={g.patient.zimmer} /> : null}
+                  <p className="font-extrabold">{g.patient ? g.patient.name : "Ganzer Flur"}</p>
                 </header>
                 <ul className="flex flex-col gap-1.5">
                   {g.aufgaben.map((a) => (
@@ -115,7 +147,19 @@ export function SchichtApp({ info, eintraege, aktiv }: { info: Info; eintraege: 
                         </span>
                         <span className={`text-sm font-semibold ${a.erledigt ? "text-grau line-through" : ""}`}>
                           {a.text}
-                          {a.faellig && <span className="ml-1 text-xs font-extrabold text-tuerkis">· {a.faellig}</span>}
+                          {a.faellig && (
+                            <span className={`ml-1 text-xs font-extrabold ${ueberfaellig(a) ? "text-koralle-dunkel" : "text-tuerkis"}`}>· {a.faellig}</span>
+                          )}
+                          {ueberfaellig(a) && (
+                            <span className="ml-1.5 rounded-md bg-koralle px-1.5 py-0.5 align-middle text-[10px] font-extrabold uppercase tracking-wide text-white">
+                              überfällig
+                            </span>
+                          )}
+                          {a.eigene && (
+                            <span className="ml-1.5 rounded-md bg-himmel-hell px-1.5 py-0.5 align-middle text-[10px] font-extrabold uppercase tracking-wide text-himmel">
+                              eigene
+                            </span>
+                          )}
                         </span>
                       </label>
                     </li>
@@ -133,21 +177,36 @@ export function SchichtApp({ info, eintraege, aktiv }: { info: Info; eintraege: 
           </button>
         )}
 
-        {/* Vorschau: Notizen während der Schicht */}
-        <button
-          className="flex items-center gap-3 rounded-2xl border-2 border-dashed border-linie px-4 py-3 text-left"
-          disabled
-          title="Kommt bald: Notizen während der Schicht, die Otti in die Übergabe einbaut"
-        >
-          <span className="grid h-10 w-10 place-items-center rounded-full bg-tuerkis-hell text-tuerkis">
-            <IconMikro className="h-5 w-5" />
-          </span>
-          <span className="flex-1">
-            <span className="block text-sm font-extrabold">Notiz für Otti</span>
-            <span className="block text-xs font-semibold text-grau">Kurz einsprechen, was dir auffällt. Otti baut es in die Übergabe ein.</span>
-          </span>
-          <span className="rounded-lg bg-sonne-hell px-2 py-1 text-[10px] font-extrabold uppercase tracking-wider text-sonne-dunkel">bald</span>
-        </button>
+        {/* Notizen für Otti */}
+        <section>
+          <Titel>Notizen für die Übergabe · {notizen.length}</Titel>
+          {notizen.length > 0 && (
+            <ul className="mb-2 flex flex-col gap-1.5">
+              {notizen.slice(-3).map((n) => (
+                <li key={n.id} className="rounded-xl bg-flaeche px-3 py-2 text-sm font-semibold">
+                  <span className="mr-1.5 text-xs font-extrabold text-tuerkis">{uhrzeit(n.created_at)}</span>
+                  <PatientChip patientId={n.patient_id} patienten={patienten} />
+                  <span className="mt-0.5 block">{n.text}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+          <Link href="/otti" className="flex items-center gap-3 rounded-2xl border-2 border-b-4 border-linie bg-white px-4 py-3 hover:bg-tuerkis-hell">
+            <span className="grid h-10 w-10 place-items-center rounded-full bg-tuerkis-hell text-tuerkis">
+              <IconChat className="h-5 w-5" />
+            </span>
+            <span className="flex-1">
+              <span className="block text-sm font-extrabold">{aktiv >= 3 ? "Otti fragen" : "Notiz für Otti"}</span>
+              <span className="block text-xs font-semibold text-grau">
+                {aktiv >= 3
+                  ? "Fragen zu deinen Patienten stellen."
+                  : notizen.length > 3
+                  ? `Alle ${notizen.length} Notizen ansehen, neue einsprechen oder Otti etwas fragen.`
+                  : "Kurz einsprechen, was dir auffällt. Otti baut es in die Übergabe ein."}
+              </span>
+            </span>
+          </Link>
+        </section>
       </main>
       <TabLeiste />
 
@@ -174,7 +233,7 @@ export function SchichtApp({ info, eintraege, aktiv }: { info: Info; eintraege: 
             <ul className="mt-3 flex max-h-56 flex-col gap-1 overflow-y-auto">
               {offen.map((a) => (
                 <li key={a.id} className="rounded-xl bg-flaeche px-3 py-2 text-sm font-semibold">
-                  <span className="font-black">Zi. {a.patient.zimmer}:</span> {a.text}
+                  <span className="font-black">{a.patient ? `Zi. ${a.patient.zimmer}` : "Flur"}:</span> {a.text}
                 </li>
               ))}
             </ul>

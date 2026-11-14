@@ -165,8 +165,28 @@ for (const [name, schicht, sys, dia, puls, schmerz, temp, spo2, situation, asses
     pruefe(await sb.from("tasks").insert(extra.tasks.map((t) => ({ ...t, patient_id: patId[name], handover_id: h.id }))), `Aufgaben ${name}`);
 }
 
+// 4) Otti: Notizen und eigene Aufgaben zurücksetzen, eine vorbereitete Notiz für Anna (Becker, 11:30)
+let notizText = "";
+if (!NUR_NACHT) {
+  pruefe(await sb.from("notizen").delete().not("id", "is", null).select("id"), "Notizen löschen");
+  pruefe(await sb.from("tasks").delete().is("handover_id", null).select("id"), "Eigene Aufgaben löschen");
+  pruefe(
+    await sb.from("notizen").insert({
+      mitarbeiter_id: maId["P-1023"],
+      patient_id: patId["Ingrid Becker"],
+      bereich: "Flur A",
+      datum: heute,
+      schicht: "frueh",
+      text: "Mittagessen kaum angerührt, wirkt müde.",
+      created_at: zeit(heute, "11:30"),
+    }),
+    "Demo-Notiz",
+  );
+  notizText = " Notizen zurückgesetzt, Demo-Notiz für Anna (Becker 11:30).";
+}
+
 console.log(
   NUR_NACHT
     ? `Nachtschicht vom ${gestern} eingespielt: ${EINSPIELEN.length} bestätigte Übergaben (noch nicht übernommen), Dienstplan für ${heute} gesetzt.`
-    : `Demo zurückgesetzt für ${heute}: ${geloescht.length} Übergaben gelöscht, ${EINSPIELEN.length} Verlaufs-Übergaben neu (gestern), Dienstplan für heute gesetzt.`,
+    : `Demo zurückgesetzt für ${heute}: ${geloescht.length} Übergaben gelöscht, ${EINSPIELEN.length} Verlaufs-Übergaben neu (gestern), Dienstplan für heute gesetzt.${notizText}`,
 );

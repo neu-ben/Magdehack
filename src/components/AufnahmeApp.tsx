@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { AgentEvent } from "@/lib/agent";
 import { DEMO_TEXT } from "@/lib/demo-text";
+import type { Notiz } from "@/lib/notizen";
 import type { Entwurf, Patient } from "@/lib/types";
 import { useSpeech } from "@/lib/useSpeech";
 import { KopfBand, StatusLeiste, TabLeiste } from "./AppRahmen";
@@ -11,6 +12,7 @@ import { IconMikro, IconStopp, IconWarnung } from "./Icons";
 import { Otti, type OttiStimmung } from "./Otti";
 import { SchichtPfad } from "./SchichtPfad";
 import { erwaehntePatienten, FlurUebersicht, flurStatus } from "./FlurUebersicht";
+import { NotizListe } from "./Notizen";
 import { abmelden } from "@/app/actions";
 import Link from "next/link";
 
@@ -21,10 +23,12 @@ export function AufnahmeApp({
   sitzung,
   patienten,
   initial,
+  notizen,
 }: {
   sitzung: SitzungInfo;
   patienten: Patient[];
   initial: Entwurf[];
+  notizen: Notiz[];
 }) {
   const sp = useSpeech();
   const [uebergaben, setUebergaben] = useState<Entwurf[]>(initial);
@@ -86,7 +90,11 @@ export function AufnahmeApp({
   const entwuerfe = uebergaben.filter((u) => u.status === "entwurf").sort((a, b) => dringlichkeit(b) - dringlichkeit(a));
   const bestaetigt = uebergaben.filter((u) => u.status !== "entwurf");
   const rot = entwuerfe.reduce((n, u) => n + (u.warnings ?? []).filter((w) => w.level === "rot").length, 0);
-  const alleFertig = uebergaben.length > 0 && entwuerfe.length === 0 && offeneZuordnung.length === 0;
+  // Patienten mit Notizen, aber ohne Übergabe: Otti erinnert, bevor die Übergabe als fertig gilt
+  const notizZahl = new Map<string, number>();
+  for (const n of notizen) if (n.patient_id) notizZahl.set(n.patient_id, (notizZahl.get(n.patient_id) ?? 0) + 1);
+  const nurNotiz = patienten.filter((p) => notizZahl.has(p.id) && !uebergaben.some((u) => u.patient.id === p.id));
+  const alleFertig = uebergaben.length > 0 && entwuerfe.length === 0 && offeneZuordnung.length === 0 && nurNotiz.length === 0;
 
   // Flur-Übersicht: wer ist schon besprochen?
   const status = flurStatus(patienten, uebergaben, erwaehntePatienten(transkript, patienten));
@@ -116,9 +124,15 @@ export function AufnahmeApp({
     sprechblase = rot
       ? `${entwuerfe.length} Entwürfe sind fertig. Bei ${rot === 1 ? "einem Patienten" : `${rot} Hinweisen`} bin ich unruhig – schau bitte genau hin.`
       : `${entwuerfe.length} Entwürfe sind fertig. Bitte prüfen und bestätigen.`;
+  } else if (uebergaben.length > 0 && nurNotiz.length) {
+    stimmung = "sorge";
+    const namen = nurNotiz.map((p) => `${p.name.split(" ").at(-1)} (Zi. ${p.zimmer})`).join(" und ");
+    sprechblase = `Für ${namen} hast du Notizen, aber noch keine Übergabe. Sprich sie bitte noch kurz ein.`;
   } else if (transkript && fehlend.length) {
     stimmung = "denkt";
-    const namen = fehlend.map((p) => `Zimmer ${p.zimmer} (${p.name.split(" ").at(-1)})`).join(", ");
+    const namen = fehlend
+      .map((p) => `Zimmer ${p.zimmer} (${p.name.split(" ").at(-1)}${notizZahl.has(p.id) ? ", mit Notizen" : ""})`)
+      .join(", ");
     sprechblase = `${namen} ${fehlend.length === 1 ? "fehlt" : "fehlen"} noch – absichtlich? Sonst gib mir die Übergabe!`;
   } else if (transkript) {
     sprechblase = "Alle Patienten erwähnt. Fertig? Dann gib mir die Übergabe!";
@@ -161,7 +175,18 @@ export function AufnahmeApp({
           </p>
         </section>
 
-        <FlurUebersicht bereich={sitzung.bereich} patienten={patienten} status={status} />
+        <FlurUebersicht bereich={sitzung.bereich} patienten={patienten} status={status} notizen={notizZahl} />
+
+        {notizen.length > 0 && (
+          <details className="karte px-4 py-3">
+            <summary className="cursor-pointer text-sm font-extrabold text-tuerkis-dunkel">
+              Deine Notizen ({notizen.length}) · Otti baut sie ein, du musst sie nicht wiederholen
+            </summary>
+            <div className="mt-3">
+              <NotizListe notizen={notizen} patienten={patienten} />
+            </div>
+          </details>
+        )}
 
         {/* Aufnahme */}
         <section className="flex flex-col items-center gap-3">
