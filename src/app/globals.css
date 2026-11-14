@@ -1,26 +1,77 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* Farbwelt "Otti": Türkis als Hauptfarbe, Koralle für Kritisches, Sonnengelb für "beachten" */
+@theme {
+  --color-tuerkis: #12a4a0;
+  --color-tuerkis-dunkel: #0b7a77;
+  --color-tuerkis-hell: #e3f6f5;
+  --color-koralle: #ff6b5b;
+  --color-koralle-dunkel: #d94c3f;
+  --color-koralle-hell: #ffeae7;
+  --color-sonne: #ffc23d;
+  --color-sonne-dunkel: #d99c12;
+  --color-sonne-hell: #fff5d9;
+  --color-himmel: #3d8bfd;
+  --color-himmel-hell: #e8f1ff;
+  --color-tinte: #27393a;
+  --color-grau: #7a8b8b;
+  --color-linie: #e2eaea;
+  --color-flaeche: #f5f8f8;
+  --color-fell: #9a6a43;
+  --color-fell-dunkel: #6f4a2c;
+  --color-creme: #f6e3c8;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-nunito), ui-rounded, system-ui, sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-flaeche);
+  color: var(--color-tinte);
+}
+
+/* Dicke Buttons mit "3D-Kante" unten (Tailwind-4-Utilities, damit !px-3 usw. funktionieren) */
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-b-[5px] px-5 py-3
+    text-sm font-extrabold uppercase tracking-wider transition-[transform,border-width] select-none
+    active:translate-y-[3px] active:border-b-2 disabled:cursor-not-allowed disabled:opacity-50
+    disabled:active:translate-y-0 disabled:active:border-b-[5px];
+}
+@utility btn-primaer {
+  @apply btn border-tuerkis-dunkel bg-tuerkis text-white hover:brightness-105;
+}
+@utility btn-koralle {
+  @apply btn border-koralle-dunkel bg-koralle text-white hover:brightness-105;
+}
+@utility btn-weiss {
+  @apply btn border-linie bg-white text-tuerkis hover:bg-tuerkis-hell;
+}
+@utility karte {
+  @apply rounded-3xl border-2 border-b-[5px] border-linie bg-white;
+}
+@utility feld {
+  @apply w-full rounded-xl border-2 border-linie bg-flaeche px-3 py-2 text-sm font-semibold
+    text-tinte outline-none focus:border-tuerkis focus:bg-white;
+}
+
+@keyframes wippen {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(-2deg); }
+}
+@keyframes puls-ring {
+  0% { transform: scale(1); opacity: 0.55; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+@keyframes einblenden {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.anim-wippen { animation: wippen 2.6s ease-in-out infinite; }
+.anim-einblenden { animation: einblenden 0.35s ease-out both; }
+.puls-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: var(--color-koralle);
+  animation: puls-ring 1.2s ease-out infinite;
 }
