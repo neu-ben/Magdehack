@@ -56,7 +56,7 @@ Pflegekräfte auf einer Station der **Inneren Medizin**: die abgebende und die �
 | Verfügbarkeit | Vor der Übernahme gesperrt; nach bestätigter Übergabe nur Fragen |
 | Übergabe-Seite | Aufklappbare Liste „Deine Notizen“, Notizzahl auf den Kacheln; Entwürfe nur für besprochene Patienten, Otti erinnert an Patienten mit Notizen ohne Übergabe |
 | Modell | `CLAUDE_OTTI_MODEL`, Standard Sonnet 5.5, ein Aufruf pro Nachricht |
-| Demo | `demo:reset` legt die Notiz „Becker 11:30: Mittagessen kaum angerührt, wirkt müde“ für Anna an |
+| Demo | `demo:reset` löscht alle Notizen und eigenen Aufgaben; Notizen werden in der Demo live angelegt |
 
 ## Kern-Ablauf (das MUSS in der Demo laufen)
 0. **Anmelden:** Die Pflegekraft meldet sich an. Die App holt aus dem Schichtplan Schicht und Bereich und lädt nur die Patienten dieses Bereichs.

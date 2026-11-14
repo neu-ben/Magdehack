@@ -20,7 +20,7 @@ Spracheingabe nutzt die Web Speech API und funktioniert in Chrome; tippen geht �
 | Befehl | Zweck |
 |---|---|
 | `npm run dev` | Entwicklungsserver |
-| `npm run demo:reset` | Alles zurücksetzen: Dienstplan heute, Verlauf von gestern, Notizen, Demo-Notiz für Anna |
+| `npm run demo:reset` | Alles zurücksetzen: Dienstplan heute, Verlauf von gestern, Notizen und eigene Aufgaben löschen |
 | `npm run demo:nacht` | Nur die offene Nachtschicht neu einspielen (Übergabe an den Frühdienst) |
 | `npm run lint` / `npx tsc --noEmit` | Prüfen |
 

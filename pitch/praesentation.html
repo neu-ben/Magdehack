@@ -97,6 +97,22 @@
 
   /* Schluss */
   .schluss { background: var(--tuerkis-hell); align-items: center; justify-content: center; text-align: center; }
+  /* Teich: zwei Otter treiben im Wasser und halten sich an den Pfoten */
+  .teich { position: relative; width: 720px; height: 250px; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); }
+  .otter-paar { position: absolute; left: 50%; bottom: 4px; transform: translateX(-50%); display: flex; z-index: 1; }
+  .schwimmt { animation: schwimmen 3.2s ease-in-out infinite; animation-delay: var(--d, 0s); }
+  @keyframes schwimmen { 0%,100% { transform: translateY(0) rotate(-2.5deg); } 50% { transform: translateY(7px) rotate(2.5deg); } }
+  .wasser { position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; }
+  .wasser .welle { height: 40px; background-repeat: repeat-x; background-size: 200px 40px; animation: stroemen 5s linear infinite; }
+  .wasser .tiefe { flex: 1; margin-top: -1px; }
+  .wasser.hinten { height: 84px; z-index: 0; }
+  .wasser.hinten .welle { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 40'%3E%3Cpath d='M0 14 Q 25 2 50 14 T 100 14 T 150 14 T 200 14 V40 H0Z' fill='%2380d3cf'/%3E%3C/svg%3E"); animation-direction: reverse; animation-duration: 7s; }
+  .wasser.hinten .tiefe { background: #80d3cf; }
+  .wasser.vorne { height: 58px; z-index: 2; opacity: .88; }
+  .wasser.vorne .welle { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 40'%3E%3Cpath d='M0 14 Q 25 2 50 14 T 100 14 T 150 14 T 200 14 V40 H0Z' fill='%2312a4a0'/%3E%3C/svg%3E"); }
+  .wasser.vorne .tiefe { background: #12a4a0; }
+  @keyframes stroemen { to { background-position-x: 200px; } }
+  @media (prefers-reduced-motion: reduce) { .schwimmt, .wasser .welle { animation: none !important; } }
 
   /* Bedienleiste */
   #leiste { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; gap: 8px; align-items: center; z-index: 5; }
@@ -161,9 +177,13 @@
 
   <!-- 4 Schluss (nach der Demo) -->
   <section class="folie schluss">
-    <div style="display:flex;align-items:flex-end;justify-content:center">
-      <div style="transform:scaleX(-1);position:relative;z-index:1"><div data-otti="freude" data-groesse="230" class="wippen"></div></div>
-      <div data-otti="freude" data-groesse="230" class="wippen" style="margin-left:-70px;animation-delay:-1.3s"></div>
+    <div class="teich" aria-label="Zwei Otter treiben im Wasser und halten sich an den Pfoten">
+      <div class="wasser hinten" aria-hidden="true"><div class="welle"></div><div class="tiefe"></div></div>
+      <div class="otter-paar">
+        <div class="schwimmt"><div style="transform:scaleX(-1)"><div data-otti="freude" data-groesse="230"></div></div></div>
+        <div class="schwimmt" style="--d:-1.6s;margin-left:-70px"><div data-otti="freude" data-groesse="230"></div></div>
+      </div>
+      <div class="wasser vorne" aria-hidden="true"><div class="welle"></div><div class="tiefe"></div></div>
     </div>
     <p class="unter" style="margin-top:8px">Seeotter halten sich beim Schlafen an den Pfoten, damit keiner wegtreibt.</p>
     <h1 style="margin-top:12px;color:var(--tuerkis-dunkel)">Niemand geht verloren.</h1>

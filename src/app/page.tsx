@@ -2,12 +2,14 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { anmelden } from "./actions";
 import { Otti } from "@/components/Otti";
+import { WellenRahmen } from "@/components/WellenRahmen";
 import { db } from "@/lib/supabase";
 import { heute, SCHICHT_LABEL, type Schicht } from "@/lib/session";
 
 export default function AnmeldePage() {
   return (
     <main className="flex flex-1 flex-col px-6 pb-8 pt-14">
+      <WellenRahmen />
       <div className="flex flex-col items-center text-center">
         <Otti stimmung="freude" groesse={190} wippen />
         <h1 className="mt-4 text-5xl font-black tracking-tight text-tuerkis">otti</h1>

@@ -10,7 +10,7 @@ Gemessene Wartezeiten mit Sonnet 5.5: Otti-Chat etwa **3–4 s**, Übergabe-Ausw
 
 ## Vorbereitung (direkt vor dem Pitch)
 
-- [ ] `npm run demo:reset` ausführen. Das setzt alle Daten zurück und legt Annas Notiz „Becker 11:30“ an.
+- [ ] `npm run demo:reset` ausführen. Das setzt alle Daten zurück, es gibt danach keine Notizen.
 - [ ] Der Dev-Server läuft, Chrome ist auf `http://localhost:3000` geöffnet, die Startseite ist zu sehen.
 - [ ] In `.env.local` steht `CLAUDE_MODEL=claude-sonnet-5-5`.
 - [ ] Das Mikrofon ist für localhost freigegeben: einmal antippen und erlauben.
@@ -52,7 +52,7 @@ Satz B steckt auch hinter dem Knopf **„Beispieltext“** auf der Übergabe-Sei
 | Patientin | Erwartung |
 |---|---|
 | Müller (Zi. 4) | 🔴 Blutdruck 138 → 149 → 158 → **172** mmHg, steigend über 4 Messungen, dazu Kopfschmerzen seit 13 Uhr (aus der Notiz) und Schwindel. Hinweis auf die offene Kontrolle um 07:00 |
-| Becker (Zi. 5) | Trinkmenge rückläufig (900 → 600 ml), Mittagessen kaum gegessen (Notiz 11:30), Nachmessen um 16:00 nicht abgehakt. **Schmerzwert fehlt**, gelbes Pflichtfeld |
+| Becker (Zi. 5) | Trinkmenge rückläufig (900 → 600 ml), Nachmessen um 16:00 nicht abgehakt. **Schmerzwert fehlt**, gelbes Pflichtfeld |
 
 ---
 
@@ -63,4 +63,4 @@ Satz B steckt auch hinter dem Knopf **„Beispieltext“** auf der Übergabe-Sei
 | Mikro erkennt nichts | Bei Otti Satz A eintippen. In der Übergabe **„Beispieltext“** antippen (5 s) |
 | Popup erscheint nicht | `demo:reset` vergessen. Ohne Popup weitermachen und das Popup nur erwähnen |
 | Otti braucht lange oder meldet einen Fehler | Einmal nochmal „An Otti geben“. Danach Otti-Schritt weglassen und mit Übergabe weitermachen |
-| Zeit läuft davon | Den Otti-Schritt (0:25–0:45) streichen, die Notiz von 11:30 ist trotzdem im Entwurf |
+| Zeit läuft davon | Den Otti-Schritt (0:25–0:45) streichen. Dann fehlen die Notiz zu Müller und die Aufgabe für 16:00 im Entwurf |
