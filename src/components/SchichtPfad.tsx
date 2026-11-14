@@ -2,14 +2,14 @@ import Link from "next/link";
 import { IconBoard, IconHaken, IconMikro, IconTuer } from "./Icons";
 import { Otti, type OttiStimmung } from "./Otti";
 
-// Schicht-Pfad: Zusammenfassung (Übernahme) → Versorgen → Übergabe → Feierabend.
+// Schicht-Pfad: Zusammenfassung (Übernahme) → To Do → Übergabe → Feierabend.
 // "gross": geschwungener Weg mit runden 3D-Stationen (Startseite), "klein": kompakte Leiste.
 
 export type Stufe = 0 | 1 | 2 | 3 | 4; // Index der aktiven Station, 4 = alles erledigt
 
 const STATIONEN = [
   { label: "Zusammenfassung", icon: <IconHaken className="h-8 w-8" /> },
-  { label: "Versorgen", icon: <IconBoard className="h-8 w-8" /> },
+  { label: "To Do", icon: <IconBoard className="h-8 w-8" /> },
   { label: "Übergabe", icon: <IconMikro className="h-8 w-8" /> },
   { label: "Feierabend", icon: <IconTuer className="h-8 w-8" /> },
 ];

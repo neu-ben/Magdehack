@@ -83,7 +83,9 @@ export function AufnahmeApp({
     [laden],
   );
 
-  const transkript = (sp.text + (sp.zwischen ? " " + sp.zwischen : "")).trim();
+  // Im Feld ungekürzt anzeigen (sonst verschwindet jedes Leerzeichen am Ende), gekürzt prüfen und senden
+  const feldText = sp.text + (sp.zwischen ? " " + sp.zwischen : "");
+  const transkript = feldText.trim();
   // Kritisches zuerst: rote Warnungen, dann gelbe, dann nach Zimmer
   const dringlichkeit = (u: Entwurf) =>
     (u.warnings ?? []).reduce((n, w) => n + (w.level === "rot" ? 100 : 1), 0);
@@ -210,7 +212,7 @@ export function AufnahmeApp({
           <textarea
             className="feld min-h-28 resize-y !border-0 !bg-transparent !px-1 text-[15px]"
             placeholder="Hier erscheint das Transkript. Du kannst auch tippen."
-            value={transkript}
+            value={feldText}
             onChange={(e) => sp.setText(e.target.value)}
             disabled={sp.aktiv}
           />

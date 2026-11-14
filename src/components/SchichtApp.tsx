@@ -61,11 +61,11 @@ export function SchichtApp({
     (e.uebergabe?.warnings ?? []).filter((w) => w.level === "rot").map((w) => ({ patient: e.patient, text: w.text })),
   );
   const offen = aufgaben.filter((a) => !a.erledigt);
-  // Alle Aufgaben abgehakt -> "Versorgen" ist erledigt, "Übergabe" wird aktiv und anklickbar
+  // Alle Aufgaben abgehakt -> "To Do" ist erledigt, "Übergabe" wird aktiv und anklickbar
   const versorgt = aktiv === 1 && aufgaben.length > 0 && offen.length === 0;
   const pfadAktiv: Stufe = versorgt ? 2 : aktiv;
   const pfadLinks: Partial<Record<number, string>> = {};
-  if (aktiv >= 1 && aktiv < 3) pfadLinks[1] = "#aufgaben"; // Versorgen -> Aufgabenliste
+  if (aktiv >= 1 && aktiv < 3) pfadLinks[1] = "#aufgaben"; // To Do -> Aufgabenliste
   if (pfadAktiv === 2) pfadLinks[2] = "/schicht/uebergabe";
 
   async function abhaken(id: string, erledigt: boolean) {

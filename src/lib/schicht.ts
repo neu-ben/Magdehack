@@ -9,7 +9,7 @@ const NAECHSTE: Record<Schicht, Schicht> = { frueh: "spaet", spaet: "nacht", nac
 export async function ladeSchicht(s: Sitzung) {
   const [board, eigene, notizen, eigeneAufgaben] = await Promise.all([ladeBoard(s), ladeUebergaben(s), ladeNotizen(s), ladeEigeneAufgaben(s)]);
 
-  // 0 Übernehmen → 1 Versorgen → 2 Übergabe → 3 Feierabend
+  // 0 Übernehmen → 1 To Do → 2 Übergabe → 3 Feierabend
   const uebernahmeOffen = board.eintraege.some((e) => e.uebergabe?.status === "bestaetigt");
   const begonnen = eigene.uebergaben.length > 0;
   const fertig = begonnen && eigene.uebergaben.every((u) => u.status !== "entwurf");

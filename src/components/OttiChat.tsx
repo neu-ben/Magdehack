@@ -38,7 +38,9 @@ export function OttiChat({
   const [laedt, setLaedt] = useState(false);
   const ende = useRef<HTMLDivElement>(null);
 
-  const eingabe = (sp.text + (sp.zwischen ? " " + sp.zwischen : "")).trim();
+  // Im Feld ungekürzt anzeigen (sonst verschwindet jedes Leerzeichen am Ende), gekürzt prüfen und senden
+  const feldText = sp.text + (sp.zwischen ? " " + sp.zwischen : "");
+  const eingabe = feldText.trim();
   const leer = eintraege.length === 0;
 
   // Neue Nachrichten ins Bild scrollen
@@ -267,7 +269,7 @@ export function OttiChat({
             rows={2}
             className="feld flex-1 resize-none !py-2 text-[15px]"
             placeholder={sp.aktiv ? "Ich höre zu …" : nurFragen ? "Frag Otti …" : "Notiz, Frage oder Erinnerung …"}
-            value={eingabe}
+            value={feldText}
             onChange={(e) => sp.setText(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {

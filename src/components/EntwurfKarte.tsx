@@ -344,12 +344,14 @@ function NeuEinsprechen({
   onAuswerten: (text: string) => void;
 }) {
   const sp = useSpeech();
-  const text = (sp.text + (sp.zwischen ? " " + sp.zwischen : "")).trim();
+  // Im Feld ungekürzt anzeigen (sonst verschwindet jedes Leerzeichen am Ende), gekürzt senden
+  const feldText = sp.text + (sp.zwischen ? " " + sp.zwischen : "");
+  const text = feldText.trim();
   return (
     <div className="rounded-2xl border-2 border-dashed border-tuerkis bg-tuerkis-hell p-3">
       <p className="text-sm font-extrabold text-tuerkis-dunkel">Neu einsprechen für {name}</p>
       <p className="text-xs font-semibold text-grau">Ersetzt nur diesen Patienten. Deine Änderungen auf der Karte gehen dabei verloren.</p>
-      <textarea className="feld mt-2 min-h-20" value={text} onChange={(e) => sp.setText(e.target.value)} placeholder="Sprechen oder tippen …" />
+      <textarea className="feld mt-2 min-h-20" value={feldText} onChange={(e) => sp.setText(e.target.value)} placeholder="Sprechen oder tippen …" />
       <div className="mt-2 flex gap-2">
         {sp.aktiv ? (
           <button className="btn-koralle !px-3 !py-2" onClick={sp.stop}>
