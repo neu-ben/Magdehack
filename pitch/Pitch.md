@@ -29,7 +29,6 @@ Den Klick-Ablauf der Demo findest du in [Demo.md](Demo.md).
 
 ### Folie 4 · Schluss (10 s, nach der Demo)
 
-> Als Nächstes kommt die Anbindung an Klinik-Systeme und eine Spracherkennung vor Ort.
 > Seeotter halten sich beim Schlafen an den Pfoten, damit keiner wegtreibt. **Niemand geht verloren.** Danke!
 
 ---
