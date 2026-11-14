@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { IconBoard, IconHaken, IconMikro, IconTuer } from "./Icons";
 import { Otti, type OttiStimmung } from "./Otti";
 
@@ -19,7 +20,18 @@ function stil(i: number, aktiv: Stufe) {
   return "border-linie bg-flaeche text-grau/60";
 }
 
-export function SchichtPfad({ aktiv, stimmung = "freude", variante = "gross" }: { aktiv: Stufe; stimmung?: OttiStimmung; variante?: "gross" | "klein" }) {
+export function SchichtPfad({
+  aktiv,
+  stimmung = "freude",
+  variante = "gross",
+  links,
+}: {
+  aktiv: Stufe;
+  stimmung?: OttiStimmung;
+  variante?: "gross" | "klein";
+  /** Stationen, die anklickbar sind: Index -> Ziel */
+  links?: Partial<Record<number, string>>;
+}) {
   if (variante === "klein") {
     return (
       <ol className="flex items-center justify-between px-1" aria-label="Schicht-Fortschritt">
@@ -47,12 +59,23 @@ export function SchichtPfad({ aktiv, stimmung = "freude", variante = "gross" }: 
           {i === aktiv && aktiv < 4 && (
             <span className="absolute -inset-2 animate-pulse rounded-full bg-koralle/15" aria-hidden />
           )}
-          <span
-            className={`relative grid h-[72px] w-[72px] place-items-center rounded-full border-b-[7px] ${stil(i, aktiv)}`}
-            aria-current={i === aktiv ? "step" : undefined}
-          >
-            {i < aktiv ? <IconHaken className="h-9 w-9" /> : s.icon}
-          </span>
+          {links?.[i] ? (
+            <Link
+              href={links[i]!}
+              className={`relative grid h-[72px] w-[72px] place-items-center rounded-full border-b-[7px] transition-transform hover:brightness-105 active:translate-y-1 active:border-b-2 ${stil(i, aktiv)}`}
+              aria-current={i === aktiv ? "step" : undefined}
+              aria-label={`${s.label} öffnen`}
+            >
+              {i < aktiv ? <IconHaken className="h-9 w-9" /> : s.icon}
+            </Link>
+          ) : (
+            <span
+              className={`relative grid h-[72px] w-[72px] place-items-center rounded-full border-b-[7px] ${stil(i, aktiv)}`}
+              aria-current={i === aktiv ? "step" : undefined}
+            >
+              {i < aktiv ? <IconHaken className="h-9 w-9" /> : s.icon}
+            </span>
+          )}
           <span className={`mt-1 text-xs font-extrabold uppercase tracking-wider ${i === aktiv ? "text-koralle-dunkel" : i < aktiv ? "text-tuerkis-dunkel" : "text-grau"}`}>
             {s.label}
           </span>

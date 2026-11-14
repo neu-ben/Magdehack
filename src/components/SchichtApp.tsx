@@ -29,6 +29,10 @@ export function SchichtApp({ info, eintraege, aktiv }: { info: Info; eintraege: 
     (e.uebergabe?.warnings ?? []).filter((w) => w.level === "rot").map((w) => ({ patient: e.patient, text: w.text })),
   );
   const offen = aufgaben.filter((a) => !a.erledigt);
+  // Alle Aufgaben abgehakt -> "Versorgen" ist erledigt, "Übergabe" wird aktiv und anklickbar
+  const versorgt = aktiv === 1 && aufgaben.length > 0 && offen.length === 0;
+  const pfadAktiv: Stufe = versorgt ? 2 : aktiv;
+  const pfadLinks = pfadAktiv === 2 ? { 2: "/schicht/uebergabe" } : undefined;
 
   async function abhaken(id: string, erledigt: boolean) {
     setAufgaben((as) => as.map((a) => (a.id === id ? { ...a, erledigt } : a)));
@@ -53,7 +57,7 @@ export function SchichtApp({ info, eintraege, aktiv }: { info: Info; eintraege: 
   let sprechblase = `Los geht's, ${info.vorname}! Hak ab, was du erledigt hast. Am Ende sprichst du mir die Übergabe ein.`;
   if (aktiv === 2) sprechblase = "Deine Übergabe ist angefangen. Prüf und bestätige die Entwürfe.";
   if (aktiv >= 3) sprechblase = `Übergabe fertig. ${info.naechsteSchicht} kann übernehmen. Schönen Feierabend!`;
-  if (aktiv === 1 && offen.length === 0 && aufgaben.length) sprechblase = "Alle Aufgaben erledigt – stark! Bereit für die Übergabe?";
+  if (versorgt) sprechblase = "Alle Aufgaben erledigt – stark! Tipp auf „Übergabe“, wenn du so weit bist.";
 
   return (
     <>
@@ -67,7 +71,7 @@ export function SchichtApp({ info, eintraege, aktiv }: { info: Info; eintraege: 
       <KopfBand titel={`${info.schicht} · ${info.bereich}`} untertitel={`${info.datum} · übernommen vom ${info.vorherSchicht}`} />
 
       <main className="flex flex-1 flex-col gap-5 px-4 pb-6 pt-4">
-        <SchichtPfad aktiv={aktiv} stimmung={aktiv >= 3 ? "freude" : kritisch.length ? "sorge" : "neutral"} />
+        <SchichtPfad aktiv={pfadAktiv} links={pfadLinks} stimmung={aktiv >= 3 || versorgt ? "freude" : kritisch.length ? "sorge" : "neutral"} />
 
         <p className="rounded-2xl border-2 border-linie bg-white px-4 py-3 text-center text-[15px] font-bold leading-snug">{sprechblase}</p>
 
