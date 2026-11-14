@@ -35,7 +35,7 @@ const OttiAusgabe = z.object({
 
 export type ChatZug = { rolle: "pflege" | "otti"; text: string };
 export type AbhakVorschlag = { id: string; text: string; patient_id: string | null };
-export type OttiErgebnis = { antwort: string; notizen: Notiz[]; aufgaben: EigeneAufgabe[]; abhaken: AbhakVorschlag[] };
+type OttiErgebnis = { antwort: string; notizen: Notiz[]; aufgaben: EigeneAufgabe[]; abhaken: AbhakVorschlag[] };
 
 export class OttiGesperrt extends Error {}
 

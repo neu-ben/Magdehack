@@ -49,9 +49,3 @@ export const IconX = ({ className = "h-4 w-4" }: P) => (
     <path d="M6 6l12 12M18 6L6 18" />
   </svg>
 );
-export const IconEntwurf = ({ className = "h-5 w-5" }: P) => (
-  <svg viewBox="0 0 24 24" className={className} fill="currentColor">
-    <path d="M7 3h7l5 5v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
-    <path d="M9 13h6M9 17h4" stroke="white" strokeWidth="2.2" strokeLinecap="round" />
-  </svg>
-);

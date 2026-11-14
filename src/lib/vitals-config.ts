@@ -2,7 +2,7 @@
 // Grenzwerte: allgemeine Richtwerte für Erwachsene – vor der Demo gegenprüfen!
 // Zwischen "normal" und "kritisch" liegt der Kulanzbereich (gelb).
 
-export type Grenzen = {
+type Grenzen = {
   normal: { min: number; max: number };
   kritisch: { unter: number; ueber: number }; // < unter oder > ueber = kritisch
 };
