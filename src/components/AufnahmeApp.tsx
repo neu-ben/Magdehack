@@ -10,6 +10,7 @@ import { EntwurfKarte } from "./EntwurfKarte";
 import { IconMikro, IconStopp, IconWarnung } from "./Icons";
 import { Otti, type OttiStimmung } from "./Otti";
 import { SchichtPfad } from "./SchichtPfad";
+import { erwaehntePatienten, FlurUebersicht, flurStatus } from "./FlurUebersicht";
 import { abmelden } from "@/app/actions";
 import Link from "next/link";
 
@@ -87,6 +88,12 @@ export function AufnahmeApp({
   const rot = entwuerfe.reduce((n, u) => n + (u.warnings ?? []).filter((w) => w.level === "rot").length, 0);
   const alleFertig = uebergaben.length > 0 && entwuerfe.length === 0 && offeneZuordnung.length === 0;
 
+  // Flur-Übersicht: wer ist schon besprochen?
+  const status = flurStatus(patienten, uebergaben, erwaehntePatienten(transkript, patienten));
+  const fehlend = patienten
+    .filter((p) => status.get(p.id) === "offen")
+    .sort((a, b) => a.zimmer.localeCompare(b.zimmer, "de", { numeric: true }));
+
   // Abschluss-Ansicht: nach dem letzten Bestätigen nach oben scrollen
   useEffect(() => {
     if (alleFertig) window.scrollTo({ top: 0, behavior: "smooth" });
@@ -109,8 +116,12 @@ export function AufnahmeApp({
     sprechblase = rot
       ? `${entwuerfe.length} Entwürfe sind fertig. Bei ${rot === 1 ? "einem Patienten" : `${rot} Hinweisen`} bin ich unruhig – schau bitte genau hin.`
       : `${entwuerfe.length} Entwürfe sind fertig. Bitte prüfen und bestätigen.`;
+  } else if (transkript && fehlend.length) {
+    stimmung = "denkt";
+    const namen = fehlend.map((p) => `Zimmer ${p.zimmer} (${p.name.split(" ").at(-1)})`).join(", ");
+    sprechblase = `${namen} ${fehlend.length === 1 ? "fehlt" : "fehlen"} noch – absichtlich? Sonst gib mir die Übergabe!`;
   } else if (transkript) {
-    sprechblase = "Fertig? Dann gib mir die Übergabe!";
+    sprechblase = "Alle Patienten erwähnt. Fertig? Dann gib mir die Übergabe!";
   }
 
   return (
@@ -149,6 +160,8 @@ export function AufnahmeApp({
             <span className="absolute -left-2 bottom-4 h-4 w-4 rotate-45 border-b-2 border-l-2 border-linie bg-white" />
           </p>
         </section>
+
+        <FlurUebersicht bereich={sitzung.bereich} patienten={patienten} status={status} />
 
         {/* Aufnahme */}
         <section className="flex flex-col items-center gap-3">
