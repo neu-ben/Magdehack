@@ -75,6 +75,7 @@ export function TabLeiste() {
   const tabs = [
     { href: "/schicht", label: "Schicht", icon: <IconMikro /> },
     { href: "/board", label: "Board", icon: <IconBoard /> },
+    { href: "/otti", label: "Otti", icon: <IconChat /> },
   ];
   return (
     <nav className="sticky bottom-0 z-20 mt-auto flex items-center justify-around border-t-2 border-linie bg-white px-2 py-2">
@@ -93,10 +94,6 @@ export function TabLeiste() {
           </Link>
         );
       })}
-      <span className="flex cursor-not-allowed flex-col items-center px-4 py-1.5 text-[11px] font-extrabold uppercase tracking-wide text-grau/50" title="Mit Otti reden – kommt bald">
-        <IconChat />
-        Otti
-      </span>
       <form action={abmelden}>
         <button className="flex flex-col items-center px-4 py-1.5 text-[11px] font-extrabold uppercase tracking-wide text-grau hover:text-koralle">
           <IconTuer />
