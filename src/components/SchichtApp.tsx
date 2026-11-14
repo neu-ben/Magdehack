@@ -71,13 +71,6 @@ export function SchichtApp({ info, eintraege, aktiv }: { info: Info; eintraege: 
 
         <p className="rounded-2xl border-2 border-linie bg-white px-4 py-3 text-center text-[15px] font-bold leading-snug">{sprechblase}</p>
 
-        {/* Hauptaktion */}
-        {aktiv < 3 && (
-          <button className="btn-koralle w-full !py-4 text-base" onClick={zurUebergabe}>
-            <IconMikro className="h-5 w-5" /> {aktiv === 2 ? "Weiter zur Übergabe" : "Schicht beenden & Übergabe einsprechen"}
-          </button>
-        )}
-
         {/* Angepinnte kritische Hinweise */}
         {kritisch.length > 0 && (
           <section>
@@ -132,6 +125,13 @@ export function SchichtApp({ info, eintraege, aktiv }: { info: Info; eintraege: 
             ))}
           </div>
         </section>
+
+        {/* Hauptaktion: erst abhaken, dann Schicht beenden */}
+        {aktiv < 3 && (
+          <button className="btn-koralle w-full !py-4 text-base" onClick={zurUebergabe}>
+            <IconMikro className="h-5 w-5" /> {aktiv === 2 ? "Weiter zur Übergabe" : "Schicht beenden & Übergabe einsprechen"}
+          </button>
+        )}
 
         {/* Vorschau: Notizen während der Schicht */}
         <button
