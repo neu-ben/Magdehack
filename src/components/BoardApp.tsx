@@ -35,7 +35,7 @@ export function BoardApp({ info, eintraege }: { info: Info; eintraege: BoardEint
     text = `Der ${info.vorherSchicht} hat noch keine Übergabe bestätigt.`;
   } else if (kritisch.length) {
     stimmung = "sorge";
-    text = `Übernommen. Denk an ${kritisch.length === 1 ? "den kritischen Hinweis" : `die ${kritisch.length} kritischen Hinweise`}.`;
+    text = `Denk an ${kritisch.length === 1 ? "den kritischen Hinweis" : `die ${kritisch.length} kritischen Hinweise`}.`;
   } else if (uebernommen.length) {
     stimmung = "freude";
   }

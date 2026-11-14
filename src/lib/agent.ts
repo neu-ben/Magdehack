@@ -16,6 +16,7 @@ import { uhrzeit } from "./zeit";
 
 export type AgentEvent =
   | { type: "step"; text: string }
+  | { type: "arbeitet"; patient: { id: string; name: string; zimmer: string } } // ein Helfer-Otter beginnt
   | { type: "draft"; handoverId: string; patient: { id: string; name: string; zimmer: string } }
   | { type: "unassigned"; text: string; grund: string; vermutung?: string }
   | { type: "done"; summary: string }
@@ -82,7 +83,7 @@ ${vitalsTabelleText()}
   beachten = neue/geänderte Medikamente, Schmerzen, offene Untersuchungen, Ernährung/Flüssigkeit, Sturzrisiko
   info = Angehörige, geplante Entlassung, Organisatorisches
 - warnings: Hinweise für die übernehmende Schicht. rot = zeitnah ärztlich abklären, gelb = beobachten. Jeder kritische Punkt aus highlights bekommt eine rote Warnung. Formuliere als Hinweis mit Begründung und Frage, z. B. "Blutdruck seit 4 Schichten steigend (138 → 172 mmHg), dazu Kopfschmerz – Arzt informieren?".
-- tasks: konkrete Aufgaben für die nächste Schicht, mit Zeitpunkt falls genannt.
+- tasks: höchstens 3 konkrete Aufgaben für die nächste Schicht, mit Zeitpunkt falls genannt. Nur was wirklich zu tun ist; Ähnliches zusammenfassen, nichts wiederholen, was schon als Warnung dasteht, keine allgemeinen Routinen wie "weiter beobachten".
 - Offene Aufgaben (aus der Übernahme oder selbst angelegt): Erwähnt der Abschnitt oder eine Notiz, dass eine davon erledigt ist, ist sie erledigt. Sonst übernimm sie in tasks für die nächste Schicht und markiere sie mit einem beachten-Highlight, z. B. "Blutdruck-Kontrolle 07:00 nicht abgehakt – erledigt?".
 - Notizen der Pflegekraft aus dieser Schicht (mit Uhrzeit) gehören zur Übergabe dazu, auch wenn sie im Abschnitt nicht wiederholt werden. Baue sie in SBAR, highlights, warnings und tasks ein. Messwerte aus Notizen übernimmst du in vitals, wenn der Abschnitt keinen neueren Wert desselben Typs nennt (pro Typ nur der neueste Wert). Ältere Werte nennst du im assessment mit Uhrzeit.`;
 }
@@ -234,6 +235,7 @@ export async function runHandoverAgent(opts: {
   await Promise.all(
     zuordnung.map(async ({ patient: p, abschnitt }) => {
       const k = kontext.get(p.id) ?? { verlauf: [], letzte: [], offeneAufgaben: [], notizen: [] };
+      emit({ type: "arbeitet", patient: { id: p.id, name: p.name, zimmer: p.zimmer } });
       emit({ type: "step", text: `Helfer-Otter wertet ${p.name} aus (${k.letzte.length ? `${k.letzte.length} Schichten Verlauf` : "Neuaufnahme"})` });
       try {
         const res = await client.beta.messages.parse({

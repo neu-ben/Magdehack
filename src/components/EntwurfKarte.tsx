@@ -47,6 +47,8 @@ export function EntwurfKarte({
   const [highlights, setHighlights] = useState<Highlight[]>(entwurf.highlights ?? []);
   const [warnings, setWarnings] = useState<Warnung[]>(entwurf.warnings ?? []);
   const [tasks, setTasks] = useState<Aufgabe[]>(entwurf.tasks ?? []);
+  const [alleAufgaben, setAlleAufgaben] = useState(false);
+  const SICHTBAR = 3; // weitere Aufgaben erst auf Klick
   const [vitals, setVitals] = useState<Messwert[]>(() =>
     (entwurf.vitals ?? []).map((v) => ({ ...v, status: v.status ?? "gemessen" })),
   );
@@ -273,7 +275,7 @@ export function EntwurfKarte({
         <section>
           <Titel>Aufgaben für die nächste Schicht</Titel>
           <ul className="flex flex-col gap-1.5">
-            {tasks.map((t, i) => (
+            {tasks.slice(0, alleAufgaben ? undefined : SICHTBAR).map((t, i) => (
               <li key={i} className="flex items-start gap-2 rounded-xl bg-flaeche px-3 py-2 text-sm font-semibold">
                 <span className="mt-0.5 h-4 w-4 shrink-0 rounded border-2 border-grau/50" />
                 <span className="flex-1">
@@ -286,6 +288,11 @@ export function EntwurfKarte({
               </li>
             ))}
           </ul>
+          {tasks.length > SICHTBAR && (
+            <button className="mt-1.5 text-xs font-extrabold text-tuerkis underline hover:text-tuerkis-dunkel" onClick={() => setAlleAufgaben((a) => !a)}>
+              {alleAufgaben ? "Weniger anzeigen" : `+ ${tasks.length - SICHTBAR} weitere anzeigen`}
+            </button>
+          )}
           <form
             className="mt-2 flex gap-2"
             onSubmit={(e) => {

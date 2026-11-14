@@ -12,6 +12,8 @@ export type VitalDef = {
   label: string;
   einheit: string;
   pflicht: boolean;
+  /** Woran man im gesprochenen Text erkennt, dass der Wert genannt wurde (Hinweis in der Übergabe, kein Ersatz für die KI) */
+  erkennung: RegExp;
   /** Blutdruck hat zwei Werte (systolisch/diastolisch) */
   zweiWerte?: { label1: string; label2: string };
   grenzen: Grenzen;
@@ -24,6 +26,7 @@ export const VITALS: VitalDef[] = [
     label: "Blutdruck",
     einheit: "mmHg",
     pflicht: true,
+    erkennung: /blutdruck|\brr\b/i,
     zweiWerte: { label1: "systolisch", label2: "diastolisch" },
     grenzen: { normal: { min: 100, max: 139 }, kritisch: { unter: 90, ueber: 159 } },
     grenzen2: { normal: { min: 60, max: 89 }, kritisch: { unter: 50, ueber: 99 } },
@@ -33,6 +36,7 @@ export const VITALS: VitalDef[] = [
     label: "Puls",
     einheit: "/min",
     pflicht: true,
+    erkennung: /puls|herzfrequenz/i,
     grenzen: { normal: { min: 60, max: 100 }, kritisch: { unter: 50, ueber: 120 } },
   },
   {
@@ -40,13 +44,16 @@ export const VITALS: VitalDef[] = [
     label: "Schmerz",
     einheit: "NRS 0–10",
     pflicht: true,
+    // Ein Wert muss dabei sein: "Schmerz drei", "vier von zehn", "schmerzfrei" – nur "Kopfschmerzen" reicht nicht
+    erkennung: /schmerz\w*\s+(\d+|null|eins|zwei|drei|vier|fünf|sechs|sieben|acht|neun|zehn)\b|\b(\d+|null|eins|zwei|drei|vier|fünf|sechs|sieben|acht|neun|zehn) von zehn|schmerzfrei|keine schmerzen|\bnrs\b/i,
     grenzen: { normal: { min: 0, max: 3 }, kritisch: { unter: 0, ueber: 6 } },
   },
   {
     typ: "temperatur",
     label: "Temperatur",
     einheit: "°C",
-    pflicht: false,
+    pflicht: true,
+    erkennung: /temperatur|fieber|\bgrad\b|\btemp\b/i,
     grenzen: { normal: { min: 36.0, max: 37.5 }, kritisch: { unter: 35.5, ueber: 38.4 } },
   },
   {
@@ -54,6 +61,7 @@ export const VITALS: VitalDef[] = [
     label: "Sauerstoffsättigung",
     einheit: "%",
     pflicht: false,
+    erkennung: /sättigung|sauerstoff|spo2/i,
     grenzen: { normal: { min: 95, max: 100 }, kritisch: { unter: 92, ueber: 100 } },
   },
 ];

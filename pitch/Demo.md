@@ -41,9 +41,11 @@ Gemessene Wartezeiten mit Sonnet 5.5: Otti-Chat etwa **3–4 s**, Übergabe-Ausw
 **Satz A, an Otti (etwa 7 s):**
 > Frau Müller klagt seit dreizehn Uhr über Kopfschmerzen. Und erinnere mich um sechzehn Uhr bei Frau Becker den Blutdruck nachzumessen.
 
-**Satz B, die Übergabe (etwa 15 s):**
-> Zimmer vier, Frau Müller: Blutdruck hundertzweiundsiebzig zu achtundneunzig, Puls achtundachtzig, Schmerzen vier von zehn, Kopfschmerzen und Schwindel beim Aufstehen.
-> Zimmer fünf, Frau Becker: sechshundert Milliliter getrunken, Blutdruck hundertzwanzig zu siebzig, Puls achtundsiebzig. Die Tochter kommt am Nachmittag.
+**Satz B, die Übergabe (etwa 17 s):**
+> Zimmer vier, Frau Müller: Blutdruck hundertzweiundsiebzig zu achtundneunzig, Puls achtundachtzig, Temperatur siebenunddreißig komma zwei, Schmerzen vier von zehn, Kopfschmerzen und Schwindel beim Aufstehen.
+> Zimmer fünf, Frau Becker: sechshundert Milliliter getrunken, Blutdruck hundertzwanzig zu siebzig, Puls achtundsiebzig, Temperatur sechsunddreißig komma acht. Die Tochter kommt am Nachmittag.
+
+Beim Sprechen werden unter „Bitte nennen · Pflichtwerte“ die Chips (Blutdruck, Puls, Schmerz, Temperatur) live grün. Bei Becker bleibt **Schmerz** gelb, und Otti sagt „Mir fehlt noch: Schmerz bei Becker“ – das ist gewollt und zeigt die Pflichtwert-Prüfung.
 
 Satz B steckt auch hinter dem Knopf **„Beispieltext“** auf der Übergabe-Seite, falls das Mikro streikt.
 

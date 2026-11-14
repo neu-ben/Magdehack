@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { AgentEvent } from "@/lib/agent";
 import { DEMO_TEXT } from "@/lib/demo-text";
 import type { Notiz } from "@/lib/notizen";
@@ -11,8 +11,9 @@ import { EntwurfKarte } from "./EntwurfKarte";
 import { IconMikro, IconStopp, IconWarnung } from "./Icons";
 import { Otti, type OttiStimmung } from "./Otti";
 import { SchichtPfad } from "./SchichtPfad";
-import { erwaehntePatienten, FlurUebersicht, flurStatus } from "./FlurUebersicht";
+import { abschnitteProPatient, erwaehntePatienten, fehlendePflichtwerte, FlurUebersicht, flurStatus } from "./FlurUebersicht";
 import { NotizListe } from "./Notizen";
+import { HelferOtter, type InArbeit } from "./HelferOtter";
 import { abmelden } from "@/app/actions";
 import Link from "next/link";
 
@@ -35,6 +36,14 @@ export function AufnahmeApp({
   const [schritte, setSchritte] = useState<string[]>([]);
   const [offeneZuordnung, setOffeneZuordnung] = useState<NichtZugeordnet[]>([]);
   const [agentLaeuft, setAgentLaeuft] = useState(false);
+  // Wartenanzeige: welche Patienten gerade ausgewertet werden, und seit wann der Agent läuft
+  const [inArbeit, setInArbeit] = useState<InArbeit[]>([]);
+  const [seit, setSeit] = useState(0);
+  const warteRef = useRef<HTMLDivElement>(null);
+  // Beim Start die Wartenanzeige ins Bild holen, damit man den Helfer-Ottern zusehen kann
+  useEffect(() => {
+    if (agentLaeuft) warteRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [agentLaeuft]);
   const [fehler, setFehler] = useState<string | null>(null);
 
   const laden = useCallback(async () => {
@@ -45,6 +54,8 @@ export function AufnahmeApp({
   const runAgent = useCallback(
     async (transkript: string, patientId?: string) => {
       setAgentLaeuft(true);
+      setInArbeit([]);
+      setSeit(Date.now());
       setFehler(null);
       setSchritte([]);
       if (!patientId) setOffeneZuordnung([]);
@@ -67,7 +78,9 @@ export function AufnahmeApp({
             if (!z.trim()) continue;
             const e = JSON.parse(z) as AgentEvent;
             if (e.type === "step") setSchritte((s) => [...s, e.text]);
-            if (e.type === "draft") void laden();
+            if (e.type === "arbeitet") setInArbeit((l) => [...l.filter((x) => x.id !== e.patient.id), e.patient]);
+            // Platzhalter erst entfernen, wenn die echte Karte geladen ist
+            if (e.type === "draft") void laden().then(() => setInArbeit((l) => l.filter((x) => x.id !== e.patient.id)));
             if (e.type === "unassigned")
               setOffeneZuordnung((u) => [...u, { id: Date.now() + Math.random(), text: e.text, grund: e.grund, vermutung: e.vermutung }]);
             if (e.type === "error") setFehler(e.message);
@@ -77,6 +90,7 @@ export function AufnahmeApp({
         setFehler(err instanceof Error ? err.message : "Unbekannter Fehler");
       } finally {
         setAgentLaeuft(false);
+        setInArbeit([]);
         await laden();
       }
     },
@@ -103,6 +117,16 @@ export function AufnahmeApp({
   const fehlend = patienten
     .filter((p) => status.get(p.id) === "offen")
     .sort((a, b) => a.zimmer.localeCompare(b.zimmer, "de", { numeric: true }));
+
+  // Pflichtwerte live: für alle Patienten, die noch keinen Entwurf haben
+  const abschnitte = abschnitteProPatient(transkript, patienten);
+  const ohneEntwurf = patienten
+    .filter((p) => !uebergaben.some((u) => u.patient.id === p.id))
+    .sort((a, b) => a.zimmer.localeCompare(b.zimmer, "de", { numeric: true }));
+  const pflichtLuecken = ohneEntwurf
+    .filter((p) => abschnitte.has(p.id))
+    .map((p) => ({ p, fehlt: fehlendePflichtwerte(abschnitte.get(p.id)) }))
+    .filter((x) => x.fehlt.length);
 
   // Abschluss-Ansicht: nach dem letzten Bestätigen nach oben scrollen
   useEffect(() => {
@@ -136,8 +160,14 @@ export function AufnahmeApp({
       .map((p) => `Zimmer ${p.zimmer} (${p.name.split(" ").at(-1)}${notizZahl.has(p.id) ? ", mit Notizen" : ""})`)
       .join(", ");
     sprechblase = `${namen} ${fehlend.length === 1 ? "fehlt" : "fehlen"} noch – absichtlich? Sonst gib mir die Übergabe!`;
+  } else if (transkript && pflichtLuecken.length) {
+    stimmung = "denkt";
+    sprechblase =
+      "Mir fehlt noch: " +
+      pflichtLuecken.map((x) => `${x.fehlt.map((v) => v.label).join(", ")} bei ${x.p.name.split(" ").at(-1)}`).join("; ") +
+      ". Sag es noch dazu – oder gib mir die Übergabe, dann markierst du es danach.";
   } else if (transkript) {
-    sprechblase = "Alle Patienten erwähnt. Fertig? Dann gib mir die Übergabe!";
+    sprechblase = "Alle Patienten erwähnt, alle Pflichtwerte genannt. Gib mir die Übergabe!";
   }
 
   return (
@@ -177,7 +207,7 @@ export function AufnahmeApp({
           </p>
         </section>
 
-        <FlurUebersicht bereich={sitzung.bereich} patienten={patienten} status={status} notizen={notizZahl} />
+        <FlurUebersicht bereich={sitzung.bereich} patienten={patienten} status={status} notizen={notizZahl} abschnitte={abschnitte} />
 
         {notizen.length > 0 && (
           <details className="karte px-4 py-3">
@@ -189,6 +219,10 @@ export function AufnahmeApp({
             </div>
           </details>
         )}
+
+        <div ref={warteRef} className="scroll-mt-20 empty:hidden">
+          {agentLaeuft && <HelferOtter patienten={patienten} inArbeit={inArbeit} seit={seit} />}
+        </div>
 
         {/* Aufnahme */}
         <section className="flex flex-col items-center gap-3">
@@ -249,18 +283,6 @@ export function AufnahmeApp({
               ))}
             </ol>
           </details>
-        )}
-        {schritte.length > 0 && agentLaeuft && (
-          <section className="rounded-2xl bg-tuerkis-hell px-4 py-3">
-            <ol className="flex flex-col gap-1">
-              {schritte.map((s, i) => (
-                <li key={i} className="anim-einblenden flex items-start gap-2 text-sm font-bold text-tuerkis-dunkel">
-                  <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${i === schritte.length - 1 && agentLaeuft ? "animate-pulse bg-koralle" : "bg-tuerkis"}`} />
-                  {s}
-                </li>
-              ))}
-            </ol>
-          </section>
         )}
 
         {fehler && <p className="rounded-2xl bg-koralle-hell px-4 py-3 text-sm font-bold text-koralle-dunkel">{fehler}</p>}
