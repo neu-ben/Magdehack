@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "demo:reset": "node --env-file=.env.local scripts/demo-reset.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.8.0",

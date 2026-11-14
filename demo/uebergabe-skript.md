@@ -1,6 +1,9 @@
 # Demo-Skript: Übergabe Frühdienst → Spätdienst, Flur A
 
 Passt zu den Testdaten in Supabase (Projekt "Hackathon").
+
+**Vor jeder Probe und vor der Präsentation:** `npm run demo:reset`
+Löscht alle Übergaben und spielt den Verlauf (gestern Früh/Spät/Nacht) und den Dienstplan passend zum heutigen Datum neu ein.
 Anmelden als **Anna Richter (P-1023)**, Frühdienst Flur A. Übernimmt: **Ben Krause (P-1047)**, Spätdienst Flur A.
 
 ## Zum Vorlesen (ca. 90 Sekunden)
