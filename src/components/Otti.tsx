@@ -8,11 +8,13 @@ export function Otti({
   groesse = 160,
   wippen = false,
   className = "",
+  style,
 }: {
   stimmung?: OttiStimmung;
   groesse?: number;
   wippen?: boolean;
   className?: string;
+  style?: React.CSSProperties;
 }) {
   const blickY = stimmung === "denkt" ? -4 : 0;
   const blickX = stimmung === "denkt" ? 3 : 0;
@@ -23,6 +25,7 @@ export function Otti({
       width={groesse}
       height={groesse}
       className={`${wippen ? "anim-wippen" : ""} ${className}`}
+      style={style}
       role="img"
       aria-label={`Otti der Otter (${stimmung})`}
     >
