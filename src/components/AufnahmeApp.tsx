@@ -126,7 +126,7 @@ export function AufnahmeApp({
 
   return (
     <>
-      <StatusLeiste name={sitzung.name} offen={entwuerfe.length} rot={rot} bestaetigt={bestaetigt.length} />
+      <StatusLeiste name={sitzung.name} />
       <KopfBand titel={`${sitzung.schicht} → ${sitzung.naechsteSchicht}`} untertitel={`${sitzung.bereich} · ${sitzung.datum} · ${patienten.length} Patienten`} />
 
       <main className="flex flex-1 flex-col gap-5 px-4 pb-6 pt-4">

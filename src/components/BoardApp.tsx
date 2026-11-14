@@ -21,7 +21,6 @@ export function BoardApp({ info, eintraege }: { info: Info; eintraege: BoardEint
   // Nur noch Nachschlage-Ansicht: Übernommen wird im Popup direkt nach dem Login.
   const bestaetigt = eintraege.filter((e) => e.uebergabe?.status === "bestaetigt");
   const uebernommen = eintraege.filter((e) => e.uebergabe?.status === "uebernommen");
-  const ohne = eintraege.filter((e) => !e.neuaufnahme && (!e.uebergabe || e.uebergabe.status === "entwurf"));
   const kritisch = eintraege.flatMap((e) =>
     (e.uebergabe?.warnings ?? []).filter((w) => w.level === "rot").map((w) => ({ patient: e.patient, text: w.text })),
   );
@@ -43,13 +42,7 @@ export function BoardApp({ info, eintraege }: { info: Info; eintraege: BoardEint
 
   return (
     <>
-      <StatusLeiste
-        name={info.name}
-        offen={ohne.length}
-        rot={kritisch.length}
-        bestaetigt={uebernommen.length}
-        titel={["Ohne bestätigte Übergabe", "Kritische Hinweise", "Übernommen"]}
-      />
+      <StatusLeiste name={info.name} />
       <KopfBand titel={`Übergabe ${info.vorherSchicht} · ${info.bereich}`} untertitel={`zum Nachschlagen · ${info.datum}`} />
 
       <main className="flex flex-1 flex-col gap-4 px-4 pb-6 pt-5">

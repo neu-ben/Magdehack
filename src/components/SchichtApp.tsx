@@ -63,13 +63,7 @@ export function SchichtApp({ info, eintraege, aktiv }: { info: Info; eintraege: 
 
   return (
     <>
-      <StatusLeiste
-        name={info.name}
-        offen={offen.length}
-        rot={kritisch.length}
-        bestaetigt={aufgaben.length - offen.length}
-        titel={["Offene Aufgaben", "Kritische Hinweise", "Erledigt"]}
-      />
+      <StatusLeiste name={info.name} />
       <KopfBand titel={`${info.schicht} · ${info.bereich}`} untertitel={`${info.datum} · übernommen vom ${info.vorherSchicht}`} />
 
       <main className="flex flex-1 flex-col gap-5 px-4 pb-6 pt-4">
