@@ -1,6 +1,6 @@
 # Demo-Ablauf: Otti live in 2 Minuten
 
-Teil des Pitches (insgesamt höchstens 3 Minuten, siehe [Pitch.md](../Pitch.md)).
+Teil des Pitches (insgesamt höchstens 3 Minuten, siehe [Pitch.md](Pitch.md)).
 Story: **Anna** übernimmt den Frühdienst auf Flur A, arbeitet ihre Schicht ab und übergibt per Sprache.
 Flur A hat 2 Patientinnen: **Frau Müller (Zi. 4)** und **Frau Becker (Zi. 5)**.
 

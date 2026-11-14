@@ -1,8 +1,8 @@
 # Pitch: Otti – Sprach-Übergabe für die Pflege
 
 **Höchstens 3 Minuten insgesamt.** Davon sind etwa 45 s Folien, 2:00 Live-Demo und 10 s Schluss.
-Die Folien liegen in [pitch/praesentation.html](pitch/praesentation.html). Blättern geht mit den Pfeiltasten oder der Leertaste, **F** schaltet auf Vollbild.
-Den Klick-Ablauf der Demo findest du in [demo/Demo.md](demo/Demo.md).
+Die Folien liegen in [pitch/praesentation.html](../pitch/praesentation.html). Blättern geht mit den Pfeiltasten oder der Leertaste, **F** schaltet auf Vollbild.
+Den Klick-Ablauf der Demo findest du in [Demo.md](Demo.md).
 
 | Teil | Zeit | bis |
 |---|---|---|
@@ -25,7 +25,7 @@ Den Klick-Ablauf der Demo findest du in [demo/Demo.md](demo/Demo.md).
 > Mit Otti spricht die Pflegekraft einfach. Otti sortiert nach Patienten, schreibt Entwürfe im SBAR-Schema, erkennt Trends und warnt. Aber **nichts gilt, bevor die Pflegekraft bestätigt.** Gebaut habe ich das heute mit Next.js, Supabase und Claude.
 > Ich zeig's euch live.
 
-**Jetzt in den Browser mit der App wechseln (Cmd+Tab). Live-Demo, 2 Minuten, siehe [demo/Demo.md](demo/Demo.md).**
+**Jetzt in den Browser mit der App wechseln (Cmd+Tab). Live-Demo, 2 Minuten, siehe [Demo.md](Demo.md).**
 
 ### Folie 4 · Schluss (10 s, nach der Demo)
 
