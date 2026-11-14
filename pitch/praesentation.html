@@ -143,7 +143,7 @@
 
   <!-- 3 Lösung -->
   <section class="folie">
-    <p class="kicker">Die Lösung</p>
+    <p class="kicker">Die Lösung · gebaut in 12 Stunden mit Next.js, Supabase &amp; Claude</p>
     <h2>Einfach sprechen.<br><span class="tuerkis">Otti macht daraus eine Übergabe.</span></h2>
     <div style="display:flex;align-items:center;gap:18px;margin-top:30px">
       <div data-otti="hoert" data-groesse="110"></div>
@@ -160,126 +160,7 @@
     </div>
   </section>
 
-  <!-- 4 Schicht mit Otti -->
-  <section class="folie">
-    <p class="kicker">Die ganze Schicht</p>
-    <h2>Otti begleitet von der Übernahme<br>bis zum Feierabend.</h2>
-    <div class="pfad">
-      <svg width="1120" height="330" viewBox="0 0 1120 330" style="position:absolute;inset:0">
-        <path d="M 200 70 C 300 70, 330 190, 430 190" fill="none" stroke="var(--tuerkis)" stroke-width="10" stroke-linecap="round"/>
-        <path d="M 540 190 C 640 190, 660 70, 760 70" fill="none" stroke="var(--koralle-hell)" stroke-width="10" stroke-linecap="round"/>
-        <path d="M 540 190 C 640 190, 660 70, 760 70" fill="none" stroke="var(--koralle)" stroke-width="10" stroke-linecap="round" class="weg-anim"/>
-        <path d="M 870 70 C 940 70, 950 190, 1010 190" fill="none" stroke="var(--linie)" stroke-width="8" stroke-linecap="round" stroke-dasharray=".1 18"/>
-      </svg>
-      <div class="station" style="left:30px;top:18px">
-        <div class="knoten bg-t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
-        <b class="tuerkis">Zusammenfassung</b><span>Kritisches der Vorschicht zuerst</span>
-      </div>
-      <div class="station" style="left:370px;top:138px">
-        <div class="knoten bg-t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 11h6M9 15h4"/></svg></div>
-        <b class="tuerkis">Versorgen</b><span>Aufgaben abhaken, Notizen an Otti</span>
-      </div>
-      <div class="station" style="left:700px;top:18px">
-        <div class="knoten bg-k" style="box-shadow:0 0 0 14px rgba(255,107,91,.15)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
-        <b class="koralle">Übergabe</b><span>Einsprechen, prüfen, bestätigen</span>
-      </div>
-      <div class="station" style="left:900px;top:138px">
-        <div class="knoten" style="background:var(--flaeche);color:var(--grau);border-bottom-color:var(--linie)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h5v16h-5M10 8l-4 4 4 4M6 12h10"/></svg></div>
-        <b style="color:var(--grau)">Feierabend</b><span>Nächste Schicht übernimmt</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- 5 Was Otti erkennt -->
-  <section class="folie">
-    <p class="kicker">Was Otti erkennt</p>
-    <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:28px;margin-top:auto;margin-bottom:auto;align-items:start">
-      <div class="karte" style="display:flex;flex-direction:column">
-        <div style="display:flex;align-items:center;gap:14px">
-          <div class="zimmer">4</div>
-          <div><p style="font-size:26px;font-weight:900;color:var(--tinte);margin:0">Margarete Müller</p><p style="font-size:17px;font-weight:700;color:var(--grau);margin:0">78 J. · Arterielle Hypertonie, Herzinsuffizienz</p></div>
-        </div>
-        <svg viewBox="0 0 520 150" style="margin-top:18px;width:100%">
-          <rect x="0" y="62" width="520" height="62" rx="10" fill="var(--tuerkis-hell)"/>
-          <text x="508" y="116" text-anchor="end" font-size="15" font-weight="800" fill="var(--tuerkis)">Normbereich</text>
-          <polyline points="40,108 180,83 320,61 480,20" fill="none" stroke="var(--koralle)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-          <g font-size="19" font-weight="900" fill="var(--tinte)" text-anchor="middle">
-            <circle cx="40" cy="108" r="8" fill="var(--koralle)"/><text x="40" y="142">138</text>
-            <circle cx="180" cy="83" r="8" fill="var(--koralle)"/><text x="180" y="142">149</text>
-            <circle cx="320" cy="61" r="8" fill="var(--koralle)"/><text x="320" y="142">158</text>
-            <circle cx="480" cy="20" r="11" fill="var(--koralle-dunkel)"/><text x="480" y="142" fill="var(--koralle-dunkel)">172</text>
-          </g>
-        </svg>
-        <div class="hinweis h-rot"><span class="punkt" style="background:var(--koralle)"></span>Blutdruck seit 4 Schichten steigend (138 → 172 mmHg), dazu Kopfschmerz – Arzt informieren?</div>
-        <div class="hinweis h-gelb"><span class="punkt" style="background:var(--sonne)"></span>Kontrolle 07:00 nicht abgehakt – erledigt?</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:20px">
-        <div class="karte">
-          <p style="font-size:15px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--grau)">Pflichtwert fehlt</p>
-          <div style="display:flex;gap:12px;margin-top:12px;align-items:center">
-            <span style="flex:1;border:3px solid var(--sonne);background:var(--sonne-hell);border-radius:14px;padding:12px 16px;font-size:20px;font-weight:900;color:var(--sonne-dunkel)">Schmerz · ?</span>
-            <span style="border:3px solid var(--linie);border-radius:14px;padding:12px 14px;font-size:16px;font-weight:900;color:var(--grau)">nicht erhoben</span>
-          </div>
-          <p style="font-size:18px;font-weight:700;color:var(--grau);margin-top:12px">Keine Rückfragen, nur gelb markiert.</p>
-        </div>
-        <div class="karte">
-          <p style="font-size:15px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--grau)">Notiz von 11:30</p>
-          <p style="font-size:21px;font-weight:800;margin-top:10px;color:var(--tinte)">„Mittagessen kaum angerührt, wirkt müde.“</p>
-          <p style="font-size:18px;font-weight:700;color:var(--grau);margin-top:8px">Otti baut sie automatisch in die Übergabe ein.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 6 Sicher & gebaut -->
-  <section class="folie">
-    <p class="kicker">Sicher und gebaut in 12 Stunden</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:auto;margin-bottom:auto">
-      <div>
-        <h2 style="font-size:40px">Der Mensch entscheidet.</h2>
-        <ul class="liste">
-          <li>Nichts gilt ohne Bestätigung der Pflegekraft</li>
-          <li>Nur Patienten des eigenen Flurs, laut Dienstplan</li>
-          <li>Normwerte mit Spielraum, im Kontext von Alter und Diagnose</li>
-          <li>Keine Diagnosen, höchstens „Arzt informieren?“</li>
-        </ul>
-      </div>
-      <div>
-        <h2 style="font-size:40px">Unter der Haube.</h2>
-        <div class="stack">
-          <span>Next.js</span><span>Supabase</span><span class="tuerkis">Claude</span><span>Web Speech API</span><span>Structured Outputs</span>
-        </div>
-        <div class="karte" style="margin-top:26px;display:flex;align-items:center;gap:18px">
-          <div style="display:flex;margin-left:-6px">
-            <div data-otti="denkt" data-groesse="70"></div><div data-otti="denkt" data-groesse="70" style="margin-left:-22px"></div><div data-otti="denkt" data-groesse="70" style="margin-left:-22px"></div>
-          </div>
-          <p style="font-size:21px;font-weight:800;color:var(--tinte);margin:0">Mehrere „Helfer-Otter“ werten die Patienten <span class="tuerkis">parallel</span> aus, in rund 20 Sekunden.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 7 Ausblick -->
-  <section class="folie">
-    <p class="kicker">Ausblick</p>
-    <h2>Vom Prototyp auf die Station.</h2>
-    <div class="raster r3">
-      <div class="karte">
-        <div class="symbol bg-t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></div>
-        <h3>Klinik-Systeme</h3><p>Patienten, Dienstplan und Werte über FHIR oder SAP statt Demo-Datenbank.</p>
-      </div>
-      <div class="karte">
-        <div class="symbol bg-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
-        <h3>Datenschutz</h3><p>Spracherkennung vor Ort, Daten bleiben im Haus.</p>
-      </div>
-      <div class="karte">
-        <div class="symbol bg-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></svg></div>
-        <h3>Kitteltasche</h3><p>Otti aufs Handy, als Begleiter durch die ganze Schicht.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- 8 Schluss -->
+  <!-- 4 Schluss (nach der Demo) -->
   <section class="folie schluss">
     <div style="display:flex;align-items:flex-end;justify-content:center">
       <div style="transform:scaleX(-1);position:relative;z-index:1"><div data-otti="freude" data-groesse="230" class="wippen"></div></div>
@@ -287,7 +168,8 @@
     </div>
     <p class="unter" style="margin-top:8px">Seeotter halten sich beim Schlafen an den Pfoten, damit keiner wegtreibt.</p>
     <h1 style="margin-top:12px;color:var(--tuerkis-dunkel)">Niemand geht verloren.</h1>
-    <p class="chip" style="margin-top:28px;border-color:var(--koralle);color:var(--koralle-dunkel);background:#fff">Jetzt live: Otti in Aktion</p>
+    <p class="unter" style="font-size:22px;margin-top:26px">Als Nächstes: Klinik-Systeme (FHIR / SAP) · Spracherkennung vor Ort · Otti fürs Handy</p>
+    <p class="chip" style="margin-top:22px;border-color:var(--koralle);color:var(--koralle-dunkel);background:#fff">Danke!</p>
   </section>
 </div>
 

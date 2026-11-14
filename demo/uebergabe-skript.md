@@ -1,3 +1,5 @@
+> **Veraltet:** Der aktuelle 2-Minuten-Ablauf mit kürzerem Vorlesetext steht in [Demo.md](Demo.md).
+
 # Demo-Skript: Übergabe Frühdienst → Spätdienst, Flur A
 
 Passt zu den Testdaten in Supabase (Projekt "Hackathon"). Flur A hat **2 Patienten**: Frau Müller (Zi. 4) und Frau Becker (Zi. 5).
