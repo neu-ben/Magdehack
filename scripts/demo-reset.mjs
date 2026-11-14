@@ -1,8 +1,10 @@
 // Setzt die Demo zurück: Dienstplan für HEUTE, alle Übergaben löschen, vorbereiteten Verlauf
 // (gestern Früh/Spät/Nacht) relativ zum heutigen Datum neu einspielen.
 // Aufruf: npm run demo:reset
+//         npm run demo:nacht  -> nur die offene Nachtschicht (Übergabe an den Frühdienst), sonst nichts anfassen
 import { createClient } from "@supabase/supabase-js";
 
+const NUR_NACHT = process.argv.includes("--nur-nacht");
 const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY, { auth: { persistSession: false } });
 const TZ = "Europe/Berlin";
 const tag = (offset) => {
@@ -113,11 +115,14 @@ for (const [name, alter, geschlecht, zimmer, bereich, diagnose, aufnahme] of PAT
   else patId[name] = pruefe(await sb.from("patients").insert(zeile).select("id").single(), `Patient ${name}`).id;
 }
 
-// 3) Alle Übergaben löschen (Messwerte, Warnungen, Aufgaben gehen per Cascade mit)
-const geloescht = pruefe(await sb.from("handovers").delete().not("id", "is", null).select("id"), "Übergaben löschen");
+// 3) Übergaben löschen (Messwerte, Warnungen, Aufgaben gehen per Cascade mit)
+const geloescht = NUR_NACHT
+  ? pruefe(await sb.from("handovers").delete().eq("datum", gestern).eq("schicht", "nacht").select("id"), "Nachtschicht löschen")
+  : pruefe(await sb.from("handovers").delete().not("id", "is", null).select("id"), "Übergaben löschen");
 
 // 4) Verlauf von gestern neu einspielen
-for (const [name, schicht, sys, dia, puls, schmerz, temp, spo2, situation, assessment, recommendation, highlights] of VERLAUF) {
+const EINSPIELEN = NUR_NACHT ? VERLAUF.filter((v) => v[1] === "nacht") : VERLAUF;
+for (const [name, schicht, sys, dia, puls, schmerz, temp, spo2, situation, assessment, recommendation, highlights] of EINSPIELEN) {
   const [datum, hhmm] = UHRZEIT[schicht];
   const ts = zeit(datum, hhmm);
   const diagnose = PATIENTEN.find((p) => p[0] === name)[5];
@@ -160,4 +165,8 @@ for (const [name, schicht, sys, dia, puls, schmerz, temp, spo2, situation, asses
     pruefe(await sb.from("tasks").insert(extra.tasks.map((t) => ({ ...t, patient_id: patId[name], handover_id: h.id }))), `Aufgaben ${name}`);
 }
 
-console.log(`Demo zurückgesetzt für ${heute}: ${geloescht.length} Übergaben gelöscht, ${VERLAUF.length} Verlaufs-Übergaben neu (gestern), Dienstplan für heute gesetzt.`);
+console.log(
+  NUR_NACHT
+    ? `Nachtschicht vom ${gestern} eingespielt: ${EINSPIELEN.length} bestätigte Übergaben (noch nicht übernommen), Dienstplan für ${heute} gesetzt.`
+    : `Demo zurückgesetzt für ${heute}: ${geloescht.length} Übergaben gelöscht, ${EINSPIELEN.length} Verlaufs-Übergaben neu (gestern), Dienstplan für heute gesetzt.`,
+);
