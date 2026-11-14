@@ -5,7 +5,7 @@ import type { BoardEintrag } from "@/lib/board";
 import type { Highlight } from "@/lib/types";
 import { KopfBand, StatusLeiste, TabLeiste } from "./AppRahmen";
 import { ZimmerBadge } from "./EntwurfKarte";
-import { IconWarnung } from "./Icons";
+import { IconHaken, IconWarnung } from "./Icons";
 import { Otti } from "./Otti";
 import { Verlauf } from "./Verlauf";
 
@@ -128,9 +128,17 @@ function BoardKarte({ eintrag, vorherSchicht }: { eintrag: BoardEintrag; vorherS
         {u && u.status !== "entwurf" && (u.tasks ?? []).length > 0 && (
           <ul className="flex flex-col gap-1">
             {u.tasks.map((t, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm font-semibold">
-                <span className="mt-0.5 h-4 w-4 shrink-0 rounded border-2 border-grau/50" />
-                <span>
+              <li key={t.id ?? i} className="flex items-start gap-2 text-sm font-semibold">
+                {/* Abgehakt in "Meine Schicht" -> hier als erledigt */}
+                <span
+                  className={`mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded border-2 ${
+                    t.erledigt ? "border-tuerkis-dunkel bg-tuerkis text-white" : "border-grau/50"
+                  }`}
+                  aria-label={t.erledigt ? "erledigt" : "offen"}
+                >
+                  {t.erledigt && <IconHaken className="h-3 w-3" />}
+                </span>
+                <span className={t.erledigt ? "text-grau line-through" : ""}>
                   {t.text}
                   {t.faellig && <span className="ml-1 text-xs font-extrabold text-tuerkis">· {t.faellig}</span>}
                 </span>
