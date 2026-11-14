@@ -65,7 +65,9 @@
   .wortmarke { font-size: 140px; font-weight: 900; letter-spacing: -.03em; line-height: .9; }
 
   /* Fluss */
-  .fluss { display: grid; grid-template-columns: 1fr 40px 1fr 40px 1fr 40px 1fr; align-items: stretch; gap: 8px; margin-top: auto; }
+  .fluss { display: grid; grid-template-columns: 1fr 48px 1fr 48px 1fr; align-items: stretch; gap: 8px; margin: auto 0; }
+  .fluss .karte { display: flex; align-items: center; gap: 20px; padding: 24px 28px; }
+  .fluss .karte h3 { margin-top: 0; font-size: 30px; }
   .pfeil { display: grid; place-items: center; color: var(--linie); }
   .pfeil svg { width: 36px; height: 36px; }
 
@@ -149,13 +151,11 @@
       <p style="flex:1;background:var(--flaeche);border-radius:24px;padding:18px 24px;font-size:23px;font-weight:700;font-style:italic;color:var(--tinte)">„Zimmer vier, Frau Müller. Blutdruck hundertzweiundsiebzig zu achtundneunzig, sie klagt über Kopfschmerzen … Zimmer fünf, Frau Becker …“</p>
     </div>
     <div class="fluss">
-      <div class="karte"><div class="symbol bg-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div><h3>Sprechen</h3><p>Der ganze Flur am Stück, ganz natürlich.</p></div>
+      <div class="karte"><div class="symbol bg-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div><h3>Sprechen</h3></div>
       <div class="pfeil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></div>
-      <div class="karte"><div class="symbol bg-t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 6h16M4 12h10M4 18h7"/></svg></div><h3>Sortieren</h3><p>Otti trennt nach Patienten, nur im eigenen Flur.</p></div>
+      <div class="karte"><div class="symbol bg-s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg></div><h3>Entwurf</h3></div>
       <div class="pfeil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></div>
-      <div class="karte"><div class="symbol bg-s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg></div><h3>Entwurf</h3><p>SBAR, Messwerte, Trends und Warnungen.</p></div>
-      <div class="pfeil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></div>
-      <div class="karte" style="border-color:var(--tuerkis)"><div class="symbol bg-t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><h3>Bestätigen</h3><p>Nichts gilt, bevor die Pflegekraft bestätigt.</p></div>
+      <div class="karte" style="border-color:var(--tuerkis)"><div class="symbol bg-t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><h3>Bestätigen</h3></div>
     </div>
   </section>
 
