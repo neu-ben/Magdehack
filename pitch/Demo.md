@@ -4,7 +4,9 @@ Teil des Pitches (insgesamt höchstens 3 Minuten, siehe [Pitch.md](Pitch.md)).
 Story: **Anna** übernimmt den Frühdienst auf Flur A, arbeitet ihre Schicht ab und übergibt per Sprache.
 Flur A hat 2 Patientinnen: **Frau Müller (Zi. 4)** und **Frau Becker (Zi. 5)**.
 
-Gemessene Wartezeiten mit Sonnet 5.5: Otti-Chat etwa **3–4 s**, Übergabe-Auswertung etwa **16 s**. Mit Opus dauert die Auswertung etwa 25–30 s. Für die 2 Minuten nimm **Sonnet**.
+Modelle: Übergabe-Auswertung mit **Sonnet 5.5** (gemessen **16–26 s**, schwankt mit der Auslastung der API), Otti-Chat mit **Opus 5.5** (etwa **4–5 s**).
+
+> ⚠️ Die Übergabe-Auswertung nicht auf Opus stellen: Sie dauert dann etwa 40 s, und die Demo passt nicht mehr in 2 Minuten.
 
 ---
 
@@ -12,7 +14,7 @@ Gemessene Wartezeiten mit Sonnet 5.5: Otti-Chat etwa **3–4 s**, Übergabe-Ausw
 
 - [ ] `npm run demo:reset` ausführen. Das setzt alle Daten zurück, es gibt danach keine Notizen.
 - [ ] Der Dev-Server läuft, Chrome ist auf `http://localhost:3000` geöffnet, die Startseite ist zu sehen.
-- [ ] In `.env.local` steht `CLAUDE_MODEL=claude-sonnet-5-5`.
+- [ ] In `.env.local` steht `CLAUDE_MODEL=claude-sonnet-5-5` und `CLAUDE_OTTI_MODEL=claude-opus-5-5`. Nach einer Änderung den Dev-Server neu starten.
 - [ ] Das Mikrofon ist für localhost freigegeben: einmal antippen und erlauben.
 - [ ] Die Folien sind in einem zweiten Fenster geöffnet, Folie 3 ist bereit.
 - [ ] Einmal mit der Stoppuhr geprobt.
@@ -28,7 +30,7 @@ Gemessene Wartezeiten mit Sonnet 5.5: Otti-Chat etwa **3–4 s**, Übergabe-Ausw
 | **0:25–0:45** | Tab **Otti**, Mikro antippen und sprechen (Satz A), Stopp, **Senden** | Otti bestätigt mit „Notiert für Müller … Aufgabe angelegt: 16:00 Becker“ |
 | **0:45–0:55** | Tab **Schicht**, **„Schicht beenden & Übergabe einsprechen“**, dann **„Trotzdem zur Übergabe“** | „Schichtende. Otti zeigt mir den Flur und meine Notizen.“ |
 | **0:55–1:12** | Mikro antippen und Satz B vorlesen, Stopp, **„An Otti geben“** | (vorlesen) |
-| **1:12–1:30** | Warten, etwa 16 s | „Otti trennt nach Patienten. Für jede Patientin wertet ein Helfer-Otter parallel aus: Verlauf, Normwerte mit Alter und Diagnose, meine Notizen und offene Aufgaben.“ |
+| **1:12–1:30** | Warten, 16–26 s (die Helfer-Otter-Animation läuft). Dauert es länger, den Satz rechts etwas ausführlicher sagen | „Otti trennt nach Patienten. Für jede Patientin wertet ein Helfer-Otter parallel aus: Verlauf, Normwerte mit Alter und Diagnose, meine Notizen und offene Aufgaben.“ |
 | **1:30–1:50** | **Müller:** auf die rote Warnung zeigen. **Becker:** beim fehlenden Schmerzwert **„nicht erhoben“**. Beide **Bestätigen** | „Blutdruck-Trend über vier Schichten, die Kopfschmerzen aus meiner Notiz sind drin, die offene 07:00-Kontrolle auch. Bei Becker fehlt der Schmerzwert, Otti markiert ihn gelb. Nichts gilt, bevor ich bestätige.“ |
 | **1:50–2:00** | **„Übergabe fertig!“** erscheint | „Und Ben vom Spätdienst sieht beim Anmelden genau diese Übergabe, Kritisches zuerst.“ |
 

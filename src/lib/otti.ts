@@ -12,7 +12,7 @@ import { uhrzeit } from "./zeit";
 // Frage und "Aufgabe erledigt" und liefert alles in einer festen Struktur.
 // Notizen werden als Rohtext gespeichert, ausgewertet werden sie erst bei der Übergabe.
 
-const MODEL = process.env.CLAUDE_OTTI_MODEL || "claude-sonnet-5-5";
+const MODEL = process.env.CLAUDE_OTTI_MODEL || "claude-opus-5-5";
 const client = new Anthropic();
 
 const OttiAusgabe = z.object({

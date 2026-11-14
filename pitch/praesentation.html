@@ -52,6 +52,17 @@
   .karte p { font-size: 19px; font-weight: 700; color: var(--grau); margin-top: 8px; line-height: 1.35; }
   .symbol { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; border-bottom: 6px solid rgba(0,0,0,.18); color: #fff; }
   .symbol svg { width: 32px; height: 32px; }
+    .studie { margin-top: 26px; gap: 20px; }
+  .studie .karte { padding: 20px 24px; }
+  .otti-band { display: flex; align-items: center; gap: 18px; margin-top: 20px; background: var(--tuerkis); color: #fff; border-radius: 24px; border-bottom: 6px solid var(--tuerkis-dunkel); padding: 10px 26px 10px 14px; }
+  .otti-band p { font-size: 22px; font-weight: 700; line-height: 1.35; }
+  .otti-band b { font-weight: 900; }
+  .studie .karte { display: flex; flex-direction: column; }
+  .studie .karte h3 { margin-top: 12px; }
+  .studie .karte p b { color: var(--tinte); }
+  .studie .karte p b.tuerkis { color: var(--tuerkis-dunkel); }
+  .studie .karte .zahl-gross { font-size: 64px; font-weight: 900; line-height: 1; letter-spacing: -.02em; margin: 0 !important; font-variant-numeric: tabular-nums; }
+  .quelle { margin-top: auto; padding-top: 14px; font-size: 13px; font-weight: 700; color: var(--grau); line-height: 1.4; }
   .bg-t { background: var(--tuerkis); } .bg-k { background: var(--koralle); } .bg-s { background: var(--sonne); } .bg-h { background: var(--himmel); }
 
   .wippen { animation: wippen 2.6s ease-in-out infinite; }
@@ -188,25 +199,30 @@
 
   <!-- 2 Problem -->
   <section class="folie">
-    <p class="kicker">Das Problem</p>
-    <h2>3× am Tag Schichtwechsel.<br><span class="koralle">Jedes Mal geht etwas verloren.</span></h2>
-    <div class="raster r3">
+    <p class="kicker">Das Problem · Studie: 12 simulierte Patienten, 5 Übergaben hintereinander</p>
+    <h2>Weitererzählen verliert Wissen.<br><span class="tuerkis">Weiterreichen nicht.</span></h2>
+    <div class="raster r3 studie">
       <div class="karte">
-        <div class="symbol bg-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
-        <h3>Mündlich und unter Zeitdruck</h3>
-        <p>Zwischen Klingel und Visite, oft mit Zettel in der Kitteltasche.</p>
+        <p class="zahl-gross" style="color:var(--koralle)">0&nbsp;%</p>
+        <h3>Nur erzählen</h3>
+        <p>Nach 3 Übergaben ist <b>alles weg</b>.</p>
       </div>
       <div class="karte">
-        <div class="symbol bg-s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 4 3 8-8"/><path d="M15 7h5v5"/></svg></div>
-        <h3>Trends sieht niemand</h3>
-        <p>Jede Schicht kennt nur ihre eigenen Werte, nicht den Verlauf.</p>
+        <p class="zahl-gross" style="color:var(--sonne-dunkel)">31&nbsp;%</p>
+        <h3>Erzählen + mitschreiben</h3>
+        <p>So viel kommt nach 5 Übergaben richtig an.</p>
       </div>
-      <div class="karte">
-        <div class="symbol bg-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 11h6M9 15h4"/></svg></div>
-        <h3>Offenes geht unter</h3>
-        <p>Was nicht erledigt wurde, fällt in der nächsten Schicht durchs Raster.</p>
+      <div class="karte" style="border-color:var(--tuerkis)">
+        <p class="zahl-gross" style="color:var(--tuerkis);font-size:46px;height:64px;display:flex;align-items:center">fast alles</p>
+        <h3>Ausgedrucktes Übergabeblatt</h3>
+        <p>Wird <b>weitergereicht</b>, nicht nacherzählt.</p>
       </div>
     </div>
+    <div class="otti-band">
+      <div data-otti="freude" data-groesse="72"></div>
+      <p><b>Mit Otti</b> spricht die Pflegekraft wie gewohnt, und die KI schreibt daraus das Übergabeblatt, digital. Die nächste Schicht bekommt es <b>vollständig</b>: weitergereicht, nicht nacherzählt.</p>
+    </div>
+    <p class="quelle">Quelle: Pothier D, Monteiro P, Mooktiar M, Shaw A. Pilot study to show the loss of important data in nursing handover. <i>Br J Nurs</i>. 2005;14(20):1090–1093. doi:10.12968/bjon.2005.14.20.20053</p>
   </section>
 
   <!-- 3 Live-Demo -->

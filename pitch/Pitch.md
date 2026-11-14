@@ -6,9 +6,9 @@ Den Klick-Ablauf der Demo findest du in [Demo.md](Demo.md).
 
 | Teil | Zeit | bis |
 |---|---|---|
-| Folie 1–2 (Titel, Problem) | 0:20 | 0:20 |
-| Folie 3 (Live-Demo) + Demo in der App | 2:05 | 2:25 |
-| Folie 4 (Lösung) | 0:20 | 2:45 |
+| Folie 1–2 (Titel, Problem) | 0:25 | 0:25 |
+| Folie 3 (Live-Demo) + Demo in der App | 2:05 | 2:30 |
+| Folie 4 (Lösung) | 0:15 | 2:45 |
 | Folie 5 (Schluss) | 0:10 | 2:55 |
 
 ---
@@ -17,9 +17,12 @@ Den Klick-Ablauf der Demo findest du in [Demo.md](Demo.md).
 
 > Hallo, ich bin Benny, und das ist **Otti**.
 
-### Folie 2 · Problem (15 s)
+### Folie 2 · Problem (20 s)
 
-> Auf jeder Station wechselt dreimal am Tag die Schicht. Die Übergabe läuft mündlich, unter Zeitdruck und mit Zetteln. Dabei gehen Werte und offene Aufgaben verloren. Vor allem **Trends** über mehrere Schichten sieht niemand.
+> Dreimal am Tag wechselt die Schicht, und jedes Mal wird weitererzählt. Eine Studie hat das simuliert: Nur erzählt war nach drei Übergaben **alles weg**. Mit Mitschreiben kam nach fünf Übergaben nur **ein knappes Drittel** richtig an. Nur wenn ein ausgedrucktes Übergabeblatt **weitergereicht** wurde, ging kaum etwas verloren.
+> Mit Otti spricht die Pflegekraft wie gewohnt, und die KI schreibt daraus genau dieses Blatt, nur digital.
+
+*Quelle (steht auf der Folie):* Pothier D, Monteiro P, Mooktiar M, Shaw A. Pilot study to show the loss of important data in nursing handover. Br J Nurs. 2005;14(20):1090–1093. doi:10.12968/bjon.2005.14.20.20053 – Simulation mit 12 Patienten und 5 Übergaberunden.
 
 ### Folie 3 · Live-Demo (5 s)
 
@@ -27,7 +30,7 @@ Den Klick-Ablauf der Demo findest du in [Demo.md](Demo.md).
 
 **Jetzt in den Browser mit der App wechseln (Cmd+Tab). Live-Demo, 2 Minuten, siehe [Demo.md](Demo.md).**
 
-### Folie 4 · Lösung (20 s, nach der Demo)
+### Folie 4 · Lösung (15 s, nach der Demo)
 
 > Das war Otti: Die Pflegekraft spricht einfach. Otti sortiert nach Patienten, schreibt Entwürfe im SBAR-Schema, erkennt Trends und warnt. Aber **nichts gilt, bevor die Pflegekraft bestätigt.**
 
@@ -42,4 +45,4 @@ Den Klick-Ablauf der Demo findest du in [Demo.md](Demo.md).
 - Folie 3 während der Demo stehen lassen. Nach der Demo zurück in die Präsentation und zu Folie 4 blättern.
 - Wenn die Demo länger dauert, lass Folie 4 weg und geh direkt zu Folie 5.
 - Mit der Stoppuhr proben: Die Demo darf höchstens 2:00 dauern, sonst die optionalen Schritte in Demo.md streichen.
-- Im Pitch stehen keine Statistiken, nur Zahlen aus der eigenen Demo. Studienzahlen nur mit Quelle nennen.
+- Die Studie ist eine kleine Simulation (Pilotstudie). Fragt die Jury nach, so sagen: „Eine Pilotstudie mit simulierten Patienten, aber der Effekt ist sehr deutlich.“
