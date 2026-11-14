@@ -1,9 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { AgentEvent } from "@/lib/agent";
-import type { BoardEintrag } from "@/lib/board";
-import { UebernahmePopup } from "./UebernahmePopup";
 import { DEMO_TEXT } from "@/lib/demo-text";
 import type { Entwurf, Patient } from "@/lib/types";
 import { useSpeech } from "@/lib/useSpeech";
@@ -11,6 +9,9 @@ import { KopfBand, StatusLeiste, TabLeiste } from "./AppRahmen";
 import { EntwurfKarte } from "./EntwurfKarte";
 import { IconMikro, IconStopp, IconWarnung } from "./Icons";
 import { Otti, type OttiStimmung } from "./Otti";
+import { SchichtPfad } from "./SchichtPfad";
+import { abmelden } from "@/app/actions";
+import Link from "next/link";
 
 type SitzungInfo = { name: string; vorname: string; schicht: string; naechsteSchicht: string; bereich: string; datum: string };
 type NichtZugeordnet = { id: number; text: string; grund: string; vermutung?: string };
@@ -19,15 +20,12 @@ export function AufnahmeApp({
   sitzung,
   patienten,
   initial,
-  uebernahme,
 }: {
   sitzung: SitzungInfo;
   patienten: Patient[];
   initial: Entwurf[];
-  uebernahme: { vorherSchicht: string; eintraege: BoardEintrag[] } | null;
 }) {
   const sp = useSpeech();
-  const [popup, setPopup] = useState(uebernahme !== null);
   const [uebergaben, setUebergaben] = useState<Entwurf[]>(initial);
   const [schritte, setSchritte] = useState<string[]>([]);
   const [offeneZuordnung, setOffeneZuordnung] = useState<NichtZugeordnet[]>([]);
@@ -89,6 +87,11 @@ export function AufnahmeApp({
   const rot = entwuerfe.reduce((n, u) => n + (u.warnings ?? []).filter((w) => w.level === "rot").length, 0);
   const alleFertig = uebergaben.length > 0 && entwuerfe.length === 0 && offeneZuordnung.length === 0;
 
+  // Abschluss-Ansicht: nach dem letzten Bestätigen nach oben scrollen
+  useEffect(() => {
+    if (alleFertig) window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [alleFertig]);
+
   // Was Otti gerade sagt
   let stimmung: OttiStimmung = "neutral";
   let sprechblase = `Hallo ${sitzung.vorname}! Erzähl mir, wie die Schicht war. Nenn vor jedem Patienten den Namen oder das Zimmer.`;
@@ -115,7 +118,29 @@ export function AufnahmeApp({
       <StatusLeiste name={sitzung.name} offen={entwuerfe.length} rot={rot} bestaetigt={bestaetigt.length} />
       <KopfBand titel={`${sitzung.schicht} → ${sitzung.naechsteSchicht}`} untertitel={`${sitzung.bereich} · ${sitzung.datum} · ${patienten.length} Patienten`} />
 
-      <main className="flex flex-1 flex-col gap-5 px-4 pb-6 pt-5">
+      <main className="flex flex-1 flex-col gap-5 px-4 pb-6 pt-4">
+        <div>
+          <SchichtPfad aktiv={alleFertig ? 3 : 2} variante="klein" />
+          <Link href="/schicht" className="mt-2 inline-block text-xs font-extrabold text-grau underline hover:text-tinte">
+            ← Zurück zu meiner Schicht
+          </Link>
+        </div>
+
+        {alleFertig ? (
+          <section className="anim-einblenden flex flex-col items-center gap-3 rounded-3xl bg-tuerkis-hell px-5 py-6 text-center">
+            <Otti stimmung="freude" groesse={150} wippen />
+            <h2 className="text-2xl font-black text-tuerkis-dunkel">Übergabe fertig!</h2>
+            <p className="font-bold">
+              {uebergaben.length} Patienten bestätigt. {sitzung.naechsteSchicht} kann übernehmen.
+              <br />
+              Schönen Feierabend, {sitzung.vorname}!
+            </p>
+            <form action={abmelden} className="w-full">
+              <button className="btn-primaer mt-2 w-full">Abmelden</button>
+            </form>
+          </section>
+        ) : (
+        <>
         {/* Otti mit Sprechblase */}
         <section className="flex items-end gap-2">
           <Otti stimmung={stimmung} groesse={112} wippen={agentLaeuft || sp.aktiv} className="shrink-0" />
@@ -165,6 +190,9 @@ export function AufnahmeApp({
             </button>
           </div>
         </section>
+
+        </>
+        )}
 
         {/* Agent-Schritte live */}
         {schritte.length > 0 && !agentLaeuft && (
@@ -231,16 +259,6 @@ export function AufnahmeApp({
         )}
       </main>
       <TabLeiste />
-
-      {popup && uebernahme && (
-        <UebernahmePopup
-          vorname={sitzung.vorname}
-          vorherSchicht={uebernahme.vorherSchicht}
-          bereich={sitzung.bereich}
-          eintraege={uebernahme.eintraege}
-          onUebernommen={() => setPopup(false)}
-        />
-      )}
     </>
   );
 }

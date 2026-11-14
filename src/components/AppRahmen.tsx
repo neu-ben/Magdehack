@@ -52,7 +52,7 @@ export function KopfBand({ titel, untertitel }: { titel: string; untertitel: str
 export function TabLeiste() {
   const pfad = usePathname();
   const tabs = [
-    { href: "/aufnahme", label: "Übergabe", icon: <IconMikro /> },
+    { href: "/schicht", label: "Schicht", icon: <IconMikro /> },
     { href: "/board", label: "Board", icon: <IconBoard /> },
   ];
   return (

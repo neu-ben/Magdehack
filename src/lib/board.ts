@@ -33,7 +33,7 @@ export async function ladeBoard(s: Sitzung): Promise<{ vorher: { datum: string; 
     supa
       .from("handovers")
       .select(
-        "id, patient_id, status, transkript_abschnitt, situation, background, assessment, recommendation, highlights, vitals (typ, wert, wert2, status), warnings (level, text), tasks (text, faellig)",
+        "id, patient_id, status, transkript_abschnitt, situation, background, assessment, recommendation, highlights, vitals (typ, wert, wert2, status), warnings (level, text), tasks (id, text, faellig, erledigt)",
       )
       .in("patient_id", ids)
       .eq("datum", vorher.datum)

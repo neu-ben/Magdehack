@@ -9,7 +9,7 @@ export async function anmelden(formData: FormData) {
   const id = String(formData.get("mitarbeiter_id") ?? "");
   if (!id || !(await sitzungFuer(id))) redirect("/?fehler=dienstplan");
   (await cookies()).set(SESSION_COOKIE, id, { httpOnly: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 14 });
-  redirect("/aufnahme");
+  redirect("/schicht");
 }
 
 export async function abmelden() {

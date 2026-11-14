@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
+import { vorherigeSchicht } from "./board";
 import { db } from "./supabase";
 import { SCHICHT_LABEL, type Sitzung } from "./session";
 import type { Patient } from "./types";
@@ -79,26 +80,33 @@ ${vitalsTabelleText()}
   beachten = neue/geänderte Medikamente, Schmerzen, offene Untersuchungen, Ernährung/Flüssigkeit, Sturzrisiko
   info = Angehörige, geplante Entlassung, Organisatorisches
 - warnings: Hinweise für die übernehmende Schicht. rot = zeitnah ärztlich abklären, gelb = beobachten. Jeder kritische Punkt aus highlights bekommt eine rote Warnung. Formuliere als Hinweis mit Begründung und Frage, z. B. "Blutdruck seit 4 Schichten steigend (138 → 172 mmHg), dazu Kopfschmerz – Arzt informieren?".
-- tasks: konkrete Aufgaben für die nächste Schicht, mit Zeitpunkt falls genannt.`;
+- tasks: konkrete Aufgaben für die nächste Schicht, mit Zeitpunkt falls genannt.
+- Offene Aufgaben aus der Übernahme: Erwähnt der Abschnitt, dass eine davon erledigt ist, ist sie erledigt. Sonst übernimm sie in tasks und markiere sie mit einem beachten-Highlight, z. B. "Blutdruck-Kontrolle 07:00 nicht abgehakt – erledigt?".`;
 }
 
 // ---------- Kontext ----------
 
-type Kontext = { verlauf: unknown[]; letzte: unknown[] };
+type Kontext = { verlauf: unknown[]; letzte: unknown[]; offeneAufgaben: { text: string; faellig: string | null }[] };
 
-async function ladeKontext(patienten: Patient[]): Promise<Map<string, Kontext>> {
+async function ladeKontext(s: Sitzung, patienten: Patient[]): Promise<Map<string, Kontext>> {
   const supa = db();
   const ids = patienten.map((p) => p.id);
+  const vorher = vorherigeSchicht(s.datum, s.schicht);
   const { data: hs } = await supa
     .from("handovers")
-    .select("id, patient_id, datum, schicht, situation, assessment, recommendation, bestaetigt_am, vitals (zeitpunkt, typ, wert, wert2, status)")
+    .select(
+      "id, patient_id, datum, schicht, situation, assessment, recommendation, bestaetigt_am, vitals (zeitpunkt, typ, wert, wert2, status), tasks (text, faellig, erledigt)",
+    )
     .in("patient_id", ids)
     .neq("status", "entwurf")
     .order("bestaetigt_am", { ascending: false });
   const map = new Map<string, Kontext>();
   for (const p of patienten) {
     const eigene = (hs ?? []).filter((h) => h.patient_id === p.id).slice(0, 3);
+    // Aufgaben aus der Übernahme, die in dieser Schicht nicht abgehakt wurden
+    const uebernommen = (hs ?? []).find((h) => h.patient_id === p.id && h.datum === vorher.datum && h.schicht === vorher.schicht);
     map.set(p.id, {
+      offeneAufgaben: (uebernommen?.tasks ?? []).filter((t) => !t.erledigt).map(({ text, faellig }) => ({ text, faellig })),
       verlauf: eigene
         .flatMap((h) => (h.vitals ?? []).map((v) => ({ schicht: `${h.datum} ${h.schicht}`, ...v })))
         .sort((a, b) => String(a.zeitpunkt).localeCompare(String(b.zeitpunkt))),
@@ -160,7 +168,7 @@ export async function runHandoverAgent(opts: {
   if (opts.patientId && !byId.has(opts.patientId)) throw new Error("Patient liegt nicht in deinem Bereich");
 
   // Kontext parallel zum Aufteilen laden
-  const kontextPromise = ladeKontext(opts.patientId ? [byId.get(opts.patientId)!] : patienten);
+  const kontextPromise = ladeKontext(s, opts.patientId ? [byId.get(opts.patientId)!] : patienten);
   emit({ type: "step", text: `${patienten.length} Patienten in ${s.bereich} geladen` });
 
   // 1) Aufteilen
@@ -212,7 +220,7 @@ export async function runHandoverAgent(opts: {
   let fehler = 0;
   await Promise.all(
     zuordnung.map(async ({ patient: p, abschnitt }) => {
-      const k = kontext.get(p.id) ?? { verlauf: [], letzte: [] };
+      const k = kontext.get(p.id) ?? { verlauf: [], letzte: [], offeneAufgaben: [] };
       emit({ type: "step", text: `Helfer-Otter wertet ${p.name} aus (${k.letzte.length ? `${k.letzte.length} Schichten Verlauf` : "Neuaufnahme"})` });
       try {
         const res = await client.beta.messages.parse({
@@ -230,8 +238,11 @@ export async function runHandoverAgent(opts: {
                 k.letzte.length
                   ? `Messwert-Verlauf (älteste zuerst):\n${JSON.stringify(k.verlauf)}\n\nLetzte Übergaben (neueste zuerst):\n${JSON.stringify(k.letzte)}`
                   : "Kein Verlauf vorhanden (Neuaufnahme).",
+                k.offeneAufgaben.length
+                  ? `Aufgaben aus der Übernahme, die in dieser Schicht NICHT abgehakt wurden:\n${JSON.stringify(k.offeneAufgaben)}`
+                  : "",
                 `Transkript-Abschnitt dieser Schicht:\n${abschnitt}`,
-              ].join("\n\n"),
+              ].filter(Boolean).join("\n\n"),
             },
           ],
         });
