@@ -64,6 +64,25 @@ const VERLAUF = [
 ];
 const UHRZEIT = { frueh: [gestern, "13:30"], spaet: [gestern, "21:30"], nacht: [heute, "05:30"] };
 
+// Nachtschicht: bestätigt, aber noch NICHT übernommen -> Anna (Frühdienst) sieht sie im Übernahme-Popup
+const NACHT_EXTRA = {
+  "Margarete Müller": {
+    warnings: [{ level: "gelb", text: "Blutdruck über die Nacht weiter gestiegen (149 → 158 mmHg), Kopfdruck – bei der Visite ansprechen?" }],
+    tasks: [{ text: "Blutdruck vor dem Frühstück messen", faellig: "07:00" }],
+  },
+  "Ingrid Becker": {
+    warnings: [{ level: "rot", text: "Nachts allein aufgestanden, hohes Sturzrisiko – Bettalarm/Sensormatte mit Arzt besprechen?" }],
+    tasks: [{ text: "Trinkprotokoll weiterführen", faellig: null }],
+  },
+  "Karl Schneider": { warnings: [], tasks: [{ text: "Erste Mobilisation mit Physio", faellig: "10:00" }] },
+  "Thomas Wagner": { warnings: [], tasks: [{ text: "Diabetesberatung anmelden", faellig: null }, { text: "BZ vor jeder Mahlzeit", faellig: null }] },
+  "Helga Hoffmann": { warnings: [], tasks: [{ text: "Mobilisation steigern", faellig: null }] },
+  "Jürgen Schulz": {
+    warnings: [{ level: "gelb", text: "Hb-Kontrolle morgens ausstehend – auf Teerstuhl und Kreislauf achten" }],
+    tasks: [{ text: "Hb-Kontrolle abnehmen", faellig: "06:30" }],
+  },
+};
+
 const pruefe = (r, was) => {
   if (r.error) throw new Error(`${was}: ${r.error.message}`);
   return r.data;
@@ -114,9 +133,9 @@ for (const [name, schicht, sys, dia, puls, schmerz, temp, spo2, situation, asses
         assessment,
         recommendation,
         highlights,
-        status: "uebernommen",
+        status: schicht === "nacht" ? "bestaetigt" : "uebernommen",
         bestaetigt_am: ts,
-        uebernommen_am: new Date(new Date(ts).getTime() + 30 * 60e3).toISOString(),
+        uebernommen_am: schicht === "nacht" ? null : new Date(new Date(ts).getTime() + 30 * 60e3).toISOString(),
       })
       .select("id")
       .single(),
@@ -134,6 +153,11 @@ for (const [name, schicht, sys, dia, puls, schmerz, temp, spo2, situation, asses
     ),
     `Messwerte ${name}`,
   );
+  const extra = schicht === "nacht" ? NACHT_EXTRA[name] : null;
+  if (extra?.warnings.length)
+    pruefe(await sb.from("warnings").insert(extra.warnings.map((w) => ({ ...w, patient_id: patId[name], handover_id: h.id }))), `Warnungen ${name}`);
+  if (extra?.tasks.length)
+    pruefe(await sb.from("tasks").insert(extra.tasks.map((t) => ({ ...t, patient_id: patId[name], handover_id: h.id }))), `Aufgaben ${name}`);
 }
 
 console.log(`Demo zurückgesetzt für ${heute}: ${geloescht.length} Übergaben gelöscht, ${VERLAUF.length} Verlaufs-Übergaben neu (gestern), Dienstplan für heute gesetzt.`);

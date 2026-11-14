@@ -1,12 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { BoardEintrag } from "@/lib/board";
 import type { Highlight } from "@/lib/types";
 import { KopfBand, StatusLeiste, TabLeiste } from "./AppRahmen";
 import { ZimmerBadge } from "./EntwurfKarte";
-import { IconHaken, IconWarnung } from "./Icons";
+import { IconWarnung } from "./Icons";
 import { Otti } from "./Otti";
 import { Verlauf } from "./Verlauf";
 
@@ -19,43 +18,27 @@ const HL_STIL: Record<Highlight["level"], string> = {
 };
 
 export function BoardApp({ info, eintraege }: { info: Info; eintraege: BoardEintrag[] }) {
-  const router = useRouter();
-  const [dialog, setDialog] = useState(false);
-  const [senden, setSenden] = useState(false);
-  const [fehler, setFehler] = useState<string | null>(null);
-
+  // Nur noch Nachschlage-Ansicht: Übernommen wird im Popup direkt nach dem Login.
   const bestaetigt = eintraege.filter((e) => e.uebergabe?.status === "bestaetigt");
   const uebernommen = eintraege.filter((e) => e.uebergabe?.status === "uebernommen");
-  const ohne = eintraege.filter((e) => !e.uebergabe || e.uebergabe.status === "entwurf");
+  const ohne = eintraege.filter((e) => !e.neuaufnahme && (!e.uebergabe || e.uebergabe.status === "entwurf"));
   const kritisch = eintraege.flatMap((e) =>
     (e.uebergabe?.warnings ?? []).filter((w) => w.level === "rot").map((w) => ({ patient: e.patient, text: w.text })),
   );
-  const alleUebernommen = eintraege.length > 0 && bestaetigt.length === 0 && uebernommen.length > 0;
-
-  async function uebernehmen() {
-    setSenden(true);
-    setFehler(null);
-    const res = await fetch("/api/uebernahme", { method: "POST" });
-    setSenden(false);
-    if (!res.ok) {
-      setFehler((await res.json().catch(() => ({}))).error ?? "Übernahme fehlgeschlagen");
-      return;
-    }
-    setDialog(false);
-    router.refresh();
-  }
 
   let stimmung: "freude" | "sorge" | "neutral" | "denkt" = "neutral";
-  let text = `Hallo ${info.vorname}! Hier ist die Übergabe vom ${info.vorherSchicht}.`;
-  if (alleUebernommen) {
-    stimmung = "freude";
-    text = `Du hast ${info.bereich} übernommen. Gute Schicht!`;
-  } else if (bestaetigt.length === 0) {
+  let text = `Hier kannst du die Übergabe vom ${info.vorherSchicht} jederzeit nachlesen.`;
+  if (bestaetigt.length > 0) {
+    stimmung = "denkt";
+    text = `Noch nicht übernommen. Das machst du direkt beim Start in der Übergabe.`;
+  } else if (uebergabenLeer(eintraege)) {
     stimmung = "denkt";
     text = `Der ${info.vorherSchicht} hat noch keine Übergabe bestätigt.`;
   } else if (kritisch.length) {
     stimmung = "sorge";
-    text = `${kritisch.length} kritische${kritisch.length === 1 ? "r Hinweis" : " Hinweise"} – lies die bitte zuerst.`;
+    text = `Übernommen. Denk an ${kritisch.length === 1 ? "den kritischen Hinweis" : `die ${kritisch.length} kritischen Hinweise`}.`;
+  } else if (uebernommen.length) {
+    stimmung = "freude";
   }
 
   return (
@@ -67,7 +50,7 @@ export function BoardApp({ info, eintraege }: { info: Info; eintraege: BoardEint
         bestaetigt={uebernommen.length}
         titel={["Ohne bestätigte Übergabe", "Kritische Hinweise", "Übernommen"]}
       />
-      <KopfBand titel={`Übernahme ${info.bereich}`} untertitel={`${info.vorherSchicht} → ${info.schicht} · ${info.datum}`} />
+      <KopfBand titel={`Übergabe ${info.vorherSchicht} · ${info.bereich}`} untertitel={`zum Nachschlagen · ${info.datum}`} />
 
       <main className="flex flex-1 flex-col gap-4 px-4 pb-6 pt-5">
         <section className="flex items-end gap-2">
@@ -78,73 +61,23 @@ export function BoardApp({ info, eintraege }: { info: Info; eintraege: BoardEint
           </p>
         </section>
 
-        {!alleUebernommen && bestaetigt.length > 0 && (
-          <button className="btn-primaer w-full !py-4 text-base" onClick={() => setDialog(true)}>
-            <IconHaken /> {info.bereich} übernehmen
-          </button>
-        )}
-
         {eintraege.map((e) => (
           <BoardKarte key={e.patient.id} eintrag={e} vorherSchicht={info.vorherSchicht} />
         ))}
       </main>
       <TabLeiste />
-
-      {/* Sicherheitsdialog vor der Übernahme */}
-      {dialog && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-tinte/40 sm:items-center" role="dialog" aria-modal="true">
-          <div className="anim-einblenden m-3 w-full max-w-[456px] rounded-3xl border-2 border-b-[6px] border-linie bg-white p-5">
-            <div className="flex items-center gap-3">
-              <Otti stimmung={kritisch.length ? "sorge" : "freude"} groesse={72} />
-              <div>
-                <p className="text-lg font-black leading-tight">
-                  {kritisch.length === 0
-                    ? `Keine kritischen Hinweise in ${info.bereich}`
-                    : `${kritisch.length} kritische${kritisch.length === 1 ? "r Hinweis" : " Hinweise"} in ${info.bereich}`}
-                </p>
-                <p className="text-sm font-semibold text-grau">Bitte lesen, bevor du übernimmst.</p>
-              </div>
-            </div>
-
-            {kritisch.length > 0 && (
-              <ul className="mt-4 flex max-h-72 flex-col gap-2 overflow-y-auto">
-                {kritisch.map((k, i) => (
-                  <li key={i} className="flex gap-2 rounded-xl border-2 border-koralle bg-koralle-hell px-3 py-2 text-sm font-bold text-koralle-dunkel">
-                    <IconWarnung className="mt-0.5 h-4 w-4 shrink-0" />
-                    <span>
-                      <span className="font-black">Zi. {k.patient.zimmer} · {k.patient.name}:</span> {k.text}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            {ohne.length > 0 && (
-              <p className="mt-3 rounded-xl bg-sonne-hell px-3 py-2 text-sm font-bold text-sonne-dunkel">
-                Ohne bestätigte Übergabe: {ohne.map((e) => `Zi. ${e.patient.zimmer} ${e.patient.name}`).join(", ")}. Bitte direkt beim {info.vorherSchicht} nachfragen.
-              </p>
-            )}
-            {fehler && <p className="mt-3 rounded-xl bg-koralle-hell px-3 py-2 text-sm font-bold text-koralle-dunkel">{fehler}</p>}
-
-            <div className="mt-5 flex flex-col gap-2">
-              <button className="btn-primaer w-full" onClick={uebernehmen} disabled={senden}>
-                <IconHaken className="h-4 w-4" /> {senden ? "…" : "Gelesen, übernehmen"}
-              </button>
-              <button className="btn-weiss w-full" onClick={() => setDialog(false)} disabled={senden}>
-                Zurück
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
+}
+
+function uebergabenLeer(eintraege: BoardEintrag[]) {
+  return !eintraege.some((e) => e.uebergabe && e.uebergabe.status !== "entwurf");
 }
 
 function BoardKarte({ eintrag, vorherSchicht }: { eintrag: BoardEintrag; vorherSchicht: string }) {
   const [offen, setOffen] = useState(false);
   const { patient: p, uebergabe: u, verlauf } = eintrag;
-  const status = !u ? "fehlt" : u.status;
+  const status = !u ? (eintrag.neuaufnahme ? "neu" : "fehlt") : u.status;
   const rot = (u?.warnings ?? []).some((w) => w.level === "rot");
 
   return (
@@ -160,6 +93,7 @@ function BoardKarte({ eintrag, vorherSchicht }: { eintrag: BoardEintrag; vorherS
         {status === "uebernommen" && <Chip stil="bg-tuerkis-hell text-tuerkis">Übernommen</Chip>}
         {status === "bestaetigt" && <Chip stil="bg-himmel-hell text-himmel">Bestätigt</Chip>}
         {(status === "entwurf" || status === "fehlt") && <Chip stil="bg-sonne-hell text-sonne-dunkel">Fehlt</Chip>}
+        {status === "neu" && <Chip stil="bg-himmel-hell text-himmel">Neuaufnahme</Chip>}
       </header>
 
       <div className="flex flex-col gap-3 px-4 py-3">

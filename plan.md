@@ -35,7 +35,7 @@ Pflegekräfte auf einer Station der **Inneren Medizin**: die abgebende und die �
 | Dienstplan | **Einfache Tabelle `dienstplan` in Supabase** mit erfundenen Daten. Sie steht stellvertretend für eine externe Quelle wie einen Schichtplan aus SAP. Ausblick: echte Anbindung. **Kein** Zugriff auf das SAP-System oder Daten des Arbeitgebers. |
 | Zuständigkeit | **Nach Bereich:** Der Dienstplan sagt „Anna, heute Frühdienst, Flur A“. Welche Patienten auf Flur A liegen, steht in den Patientendaten. |
 | Verantwortungsbereich | Die App zeigt und verarbeitet nur die **Patienten, für die die angemeldete Pflegekraft heute verantwortlich ist**. Beim Aufteilen vergleicht der Agent nur mit diesen Patienten. Nennt die Pflegekraft einen anderen Patienten, kommt die Meldung **„Nicht zugeordnet“**. |
-| Übernahme | **Ein Button für den ganzen Verantwortungsbereich** (meist ein Flur), nicht pro Patient. Vorher ein kurzer **Sicherheitsdialog**: „3 kritische Hinweise in deinem Bereich“, darunter die Liste, dann „Gelesen, übernehmen“. |
+| Übernahme | **Direkt nach dem Login als Popup:** Überblick über die vorherige Schicht im eigenen Bereich, kompakt, kritische Hinweise zuerst, pro Patient aufklappbar. **„Alles gesichtet, übernehmen“** übernimmt den ganzen Bereich, danach geht es in die Sprachübergabe. Das Board bleibt als Nachschlage-Ansicht. |
 | Demo | **Live einsprechen** mit einem vorbereiteten Übergabe-Skript, das zu den Testdaten passt. Dasselbe Skript liegt als Text bereit, falls das Mikrofon versagt. |
 
 ## Kern-Ablauf (das MUSS in der Demo laufen)

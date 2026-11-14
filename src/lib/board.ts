@@ -15,6 +15,8 @@ export type VerlaufPunkt = { zeitpunkt: string; wert: number; wert2: number | nu
 export type BoardEintrag = {
   patient: Patient;
   uebergabe: Entwurf | null;
+  /** Heute aufgenommen, daher keine Übergabe aus der Vorschicht zu erwarten */
+  neuaufnahme: boolean;
   verlauf: Record<string, VerlaufPunkt[]>; // typ -> Punkte, älteste zuerst
 };
 
@@ -56,12 +58,19 @@ export async function ladeBoard(s: Sitzung): Promise<{ vorher: { datum: string; 
       (verlauf[v.typ] ??= []).push({ zeitpunkt: v.zeitpunkt, wert: Number(v.wert), wert2: v.wert2 == null ? null : Number(v.wert2) });
     }
     for (const k of Object.keys(verlauf)) verlauf[k] = verlauf[k].slice(-5);
-    return { patient: p, uebergabe: h ? ({ ...h, patient: p } as unknown as Entwurf) : null, verlauf };
+    return {
+      patient: p,
+      uebergabe: h ? ({ ...h, patient: p } as unknown as Entwurf) : null,
+      neuaufnahme: !h && p.aufnahme_datum >= vorher.datum,
+      verlauf,
+    };
   });
 
   // Kritisches zuerst, dann Zimmer
   const gewicht = (e: BoardEintrag) =>
-    !e.uebergabe || e.uebergabe.status === "entwurf"
+    e.neuaufnahme
+      ? 0
+      : !e.uebergabe || e.uebergabe.status === "entwurf"
       ? 50
       : (e.uebergabe.warnings ?? []).reduce((n, w) => n + (w.level === "rot" ? 100 : 1), 0);
   eintraege.sort((a, b) => gewicht(b) - gewicht(a) || a.patient.zimmer.localeCompare(b.patient.zimmer, "de", { numeric: true }));

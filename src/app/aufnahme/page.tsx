@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { AufnahmeApp } from "@/components/AufnahmeApp";
 import { Otti } from "@/components/Otti";
+import { ladeBoard } from "@/lib/board";
 import { ladeUebergaben } from "@/lib/entwuerfe";
 import { aktuelleSitzung, SCHICHT_LABEL, type Schicht } from "@/lib/session";
 
@@ -25,7 +26,9 @@ export default function AufnahmePage() {
 async function Aufnahme() {
   const s = await aktuelleSitzung();
   if (!s) redirect("/");
-  const { patienten, uebergaben } = await ladeUebergaben(s);
+  const [{ patienten, uebergaben }, board] = await Promise.all([ladeUebergaben(s), ladeBoard(s)]);
+  // Übernahme-Popup, solange die Vorschicht bestätigte, aber noch nicht übernommene Übergaben hat
+  const offeneUebernahme = board.eintraege.some((e) => e.uebergabe?.status === "bestaetigt");
   const datum = new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(s.datum));
   return (
     <AufnahmeApp
@@ -39,6 +42,7 @@ async function Aufnahme() {
       }}
       patienten={patienten}
       initial={uebergaben}
+      uebernahme={offeneUebernahme ? { vorherSchicht: SCHICHT_LABEL[board.vorher.schicht], eintraege: board.eintraege } : null}
     />
   );
 }

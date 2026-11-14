@@ -2,6 +2,8 @@
 
 import { useCallback, useState } from "react";
 import type { AgentEvent } from "@/lib/agent";
+import type { BoardEintrag } from "@/lib/board";
+import { UebernahmePopup } from "./UebernahmePopup";
 import { DEMO_TEXT } from "@/lib/demo-text";
 import type { Entwurf, Patient } from "@/lib/types";
 import { useSpeech } from "@/lib/useSpeech";
@@ -17,12 +19,15 @@ export function AufnahmeApp({
   sitzung,
   patienten,
   initial,
+  uebernahme,
 }: {
   sitzung: SitzungInfo;
   patienten: Patient[];
   initial: Entwurf[];
+  uebernahme: { vorherSchicht: string; eintraege: BoardEintrag[] } | null;
 }) {
   const sp = useSpeech();
+  const [popup, setPopup] = useState(uebernahme !== null);
   const [uebergaben, setUebergaben] = useState<Entwurf[]>(initial);
   const [schritte, setSchritte] = useState<string[]>([]);
   const [offeneZuordnung, setOffeneZuordnung] = useState<NichtZugeordnet[]>([]);
@@ -226,6 +231,16 @@ export function AufnahmeApp({
         )}
       </main>
       <TabLeiste />
+
+      {popup && uebernahme && (
+        <UebernahmePopup
+          vorname={sitzung.vorname}
+          vorherSchicht={uebernahme.vorherSchicht}
+          bereich={sitzung.bereich}
+          eintraege={uebernahme.eintraege}
+          onUebernommen={() => setPopup(false)}
+        />
+      )}
     </>
   );
 }
