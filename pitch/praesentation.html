@@ -98,7 +98,7 @@
   /* Schluss */
   .schluss { background: var(--tuerkis-hell); align-items: center; justify-content: center; text-align: center; }
   /* Teich: zwei Otter treiben im Wasser und halten sich an den Pfoten */
-  .teich { position: relative; width: 720px; height: 250px; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); }
+  .teich { position: relative; width: 720px; height: 340px; margin-top: -90px; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); }
   .otter-paar { position: absolute; left: 50%; bottom: 4px; transform: translateX(-50%); display: flex; z-index: 1; }
   .schwimmt { animation: schwimmen 3.2s ease-in-out infinite; animation-delay: var(--d, 0s); }
   @keyframes schwimmen { 0%,100% { transform: translateY(0) rotate(-2.5deg); } 50% { transform: translateY(7px) rotate(2.5deg); } }
@@ -112,6 +112,15 @@
   .wasser.vorne .welle { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 40'%3E%3Cpath d='M0 14 Q 25 2 50 14 T 100 14 T 150 14 T 200 14 V40 H0Z' fill='%2312a4a0'/%3E%3C/svg%3E"); }
   .wasser.vorne .tiefe { background: #12a4a0; }
   @keyframes stroemen { to { background-position-x: 200px; } }
+  /* Danke-Knopf: Klick = Feuerwerk, die Otter springen vor Freude */
+  .danke { margin-top: 32px; border: 3px solid var(--koralle); border-bottom-width: 6px; border-radius: 999px; background: #fff; color: var(--koralle-dunkel); font: inherit; font-size: 22px; font-weight: 900; padding: 10px 30px; cursor: pointer; transition: transform .12s ease; }
+  .danke:hover { background: var(--koralle-hell); }
+  .danke:active { transform: translateY(3px); border-bottom-width: 3px; }
+  .danke.knall { animation: knall .45s cubic-bezier(.3,1.6,.5,1); }
+  @keyframes knall { 0% { transform: scale(1); } 40% { transform: scale(1.35) rotate(-4deg); } 100% { transform: scale(1); } }
+  .otter-paar.jubeln { animation: springen 1.1s cubic-bezier(.3,.7,.4,1); }
+  @keyframes springen { 0% { translate: 0 0; } 30% { translate: 0 -95px; } 55% { translate: 0 0; } 72% { translate: 0 -32px; } 100% { translate: 0 0; } }
+  #feuerwerk { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 20; }
   @media (prefers-reduced-motion: reduce) { .schwimmt, .wasser .welle { animation: none !important; } }
 
 
@@ -254,10 +263,11 @@
     </div>
     <p class="unter" style="margin-top:8px">Seeotter halten sich beim Schlafen an den Pfoten, damit keiner wegtreibt.</p>
     <h1 style="margin-top:12px;color:var(--tuerkis-dunkel)">Niemand geht verloren.</h1>
-    <p class="chip" style="margin-top:32px;border-color:var(--koralle);color:var(--koralle-dunkel);background:#fff">Danke!</p>
+    <button class="danke" id="danke" type="button">Danke!</button>
   </section>
 </div>
 
+<canvas id="feuerwerk" aria-hidden="true"></canvas>
 <nav id="leiste" aria-label="Folien"></nav>
 <p id="hilfe">← → blättern · F Vollbild</p>
 
@@ -343,6 +353,92 @@ buehne.addEventListener("click", (e) => {
   zeige(jetzt + (e.clientX > r.left + r.width / 2 ? 1 : -1));
 });
 zeige((parseInt(location.hash.slice(1), 10) || 1) - 1);
+
+// ---------- Feuerwerk beim Klick auf "Danke!" ----------
+const leinwand = document.getElementById("feuerwerk");
+const ctx = leinwand.getContext("2d");
+const FARBEN = ["#12a4a0", "#0b7a77", "#ff6b5b", "#d94c3f", "#ffc23d", "#3d8bfd"];
+let funken = [], raketen = [], ringe = [], laeuft = false;
+
+function groesseAnpassen() {
+  const dpr = devicePixelRatio || 1;
+  leinwand.width = innerWidth * dpr;
+  leinwand.height = innerHeight * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+addEventListener("resize", groesseAnpassen);
+groesseAnpassen();
+
+function explosion(x, y, anzahl, staerke) {
+  const farbe = FARBEN[Math.floor(Math.random() * FARBEN.length)];
+  for (let i = 0; i < anzahl; i++) {
+    const winkel = Math.random() * Math.PI * 2;
+    const tempo = (0.35 + Math.random() * 0.65) * staerke;
+    funken.push({
+      x, y, px: x, py: y,
+      vx: Math.cos(winkel) * tempo, vy: Math.sin(winkel) * tempo,
+      leben: 1, abbau: 0.011 + Math.random() * 0.012,
+      groesse: 2 + Math.random() * 3,
+      // meist Farbe der Explosion, ein paar bunte Ausreißer
+      farbe: Math.random() < 0.75 ? farbe : FARBEN[Math.floor(Math.random() * FARBEN.length)],
+    });
+  }
+  ringe.push({ x, y, r: 4, alpha: 0.6, farbe });
+}
+
+function rakete(verzoegerung) {
+  setTimeout(() => {
+    const x = innerWidth * (0.12 + Math.random() * 0.76);
+    raketen.push({ x, y: innerHeight + 10, ziel: innerHeight * (0.12 + Math.random() * 0.4), vy: -(11 + Math.random() * 4) });
+    starten();
+  }, verzoegerung);
+}
+
+function schritt() {
+  ctx.clearRect(0, 0, innerWidth, innerHeight);
+  ctx.lineCap = "round";
+  for (const r of raketen) {
+    r.y += r.vy;
+    ctx.strokeStyle = "rgba(255, 194, 61, .9)";
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(r.x, r.y); ctx.lineTo(r.x, r.y + 24); ctx.stroke();
+    if (r.y <= r.ziel) { explosion(r.x, r.y, 70 + Math.floor(Math.random() * 40), 9); r.weg = true; }
+  }
+  raketen = raketen.filter((r) => !r.weg);
+  for (const g of ringe) {
+    g.r += 9; g.alpha *= 0.9;
+    ctx.globalAlpha = g.alpha; ctx.strokeStyle = g.farbe; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(g.x, g.y, g.r, 0, Math.PI * 2); ctx.stroke();
+  }
+  ringe = ringe.filter((g) => g.alpha > 0.03);
+  for (const f of funken) {
+    f.px = f.x; f.py = f.y;
+    f.vx *= 0.975; f.vy = f.vy * 0.975 + 0.09; // Luftwiderstand und Schwerkraft
+    f.x += f.vx; f.y += f.vy;
+    f.leben -= f.abbau;
+    ctx.globalAlpha = Math.max(0, f.leben);
+    ctx.strokeStyle = f.farbe; ctx.lineWidth = f.groesse;
+    ctx.beginPath(); ctx.moveTo(f.px, f.py); ctx.lineTo(f.x, f.y); ctx.stroke();
+  }
+  funken = funken.filter((f) => f.leben > 0);
+  ctx.globalAlpha = 1;
+  if (funken.length || raketen.length || ringe.length) requestAnimationFrame(schritt);
+  else { laeuft = false; ctx.clearRect(0, 0, innerWidth, innerHeight); }
+}
+function starten() { if (!laeuft) { laeuft = true; requestAnimationFrame(schritt); } }
+
+const danke = document.getElementById("danke");
+const otterPaar = document.querySelector(".otter-paar");
+danke.addEventListener("click", (e) => {
+  e.stopPropagation(); // nicht blättern
+  danke.classList.remove("knall"); void danke.offsetWidth; danke.classList.add("knall");
+  otterPaar.classList.remove("jubeln"); void otterPaar.offsetWidth; otterPaar.classList.add("jubeln");
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const r = danke.getBoundingClientRect();
+  explosion(r.left + r.width / 2, r.top + r.height / 2, 140, 14);
+  starten();
+  for (let i = 0; i < 8; i++) rakete(150 + i * 220 + Math.random() * 120);
+});
 </script>
 </body>
 </html>
